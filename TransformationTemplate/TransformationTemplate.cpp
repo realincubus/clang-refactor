@@ -26,7 +26,10 @@ using namespace clang;
 namespace cl = llvm::cl;
 
 int TransformationTemplateTransform::apply(const CompilationDatabase &Database,
-                               const std::vector<std::string> &SourcePaths) {
+                               const std::vector<std::string> &SourcePaths,
+			       const llvm::cl::list<std::string>& LineRanges 
+			       ) {
+  parsePositionArguments( LineRanges ); 
   ClangTool TransformationTemplateTool(Database, SourcePaths);
 
   unsigned AcceptedChanges = 0;

@@ -23,7 +23,7 @@ const char *MatcherTransformationTemplateID = "matcherTransformationTemplateID";
 
 
 StatementMatcher makeTransformationTemplateMatcher(){
-    return anything();
+    return anything().bind(MatcherTransformationTemplateID);
 }
 
 

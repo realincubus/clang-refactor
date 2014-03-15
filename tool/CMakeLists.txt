@@ -62,6 +62,9 @@ list(APPEND ClangModernizeSources ${RepairBrokenNullCheckSources})
 file(GLOB_RECURSE CollapseIfStatementSources "../CollapsIfStatement/*.cpp")
 list(APPEND ClangModernizeSources ${CollapseIfStatementSources})
 
+file(GLOB_RECURSE ExtractMethodSources "../ExtractMethod/*.cpp")
+list(APPEND ClangModernizeSources ${ExtractMethodSources})
+
 add_clang_executable(clang-refactor
   ${ClangModernizeSources}
   )

@@ -81,33 +81,6 @@ Transform::Transform(llvm::StringRef Name, const TransformOptions &Options)
 
 Transform::~Transform() {}
 
-bool Transform::isInRange( const clang::Expr* expr , const clang::SourceManager& SM ){
-
-    // assume all was ment if not present
-    if ( line_ranges.empty() ) return true;
-
-    auto start_loc = expr->getLocStart();
-    auto end_loc = expr->getLocEnd();
-    FullSourceLoc full_start_loc( start_loc, SM );
-    FullSourceLoc full_end_loc( end_loc, SM );
-    auto expr_line_begin = full_start_loc.getSpellingLineNumber();
-    auto expr_column_begin = full_start_loc.getSpellingColumnNumber();
-    auto expr_line_end = full_end_loc.getSpellingLineNumber();
-    auto expr_column_end = full_end_loc.getSpellingColumnNumber();
-    for( auto line_range : line_ranges ){
-
-	if ( expr_line_begin >= line_range.line_begin && expr_line_end <= line_range.line_end ){
-	    if ( expr_line_begin == line_range.line_end ){
-		if ( ! ( expr_column_begin >= line_range.column_begin && expr_column_end <= line_range.column_end ) ){
-		    return false;
-		}
-	    }
-	    return true;
-	}
-    }
-    return false;
-}
-
 
 
 bool Transform::isFileModifiable(const SourceManager &SM,

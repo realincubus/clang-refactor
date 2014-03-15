@@ -62,6 +62,7 @@ void TransformationTemplateFixer::run(const ast_matchers::MatchFinder::MatchResu
 
   auto node = Result.Nodes.getNodeAs<BinaryOperator>(MatcherTransformationTemplateID);
   if ( node ) {
+      if ( !Owner.isInRange( node, SM ) return;
       SourceLocation StartLoc = node->getLocStart();
       SourceLocation EndLoc = node->getLocEnd();
       ReplaceWith( Owner, SM, StartLoc, EndLoc, context, node );
