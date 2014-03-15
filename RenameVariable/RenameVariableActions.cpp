@@ -1,4 +1,4 @@
-//===-- TransformationTemplate/TransformationTemplateActions.cpp - Matcher callback ------------------===//
+//===-- RenameVariable/RenameVariableActions.cpp - Matcher callback ------------------===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -8,14 +8,14 @@
 //===----------------------------------------------------------------------===//
 ///
 /// \file
-/// \brief This file contains the definition of the TransformationTemplateFixer class which is
+/// \brief This file contains the definition of the RenameVariableFixer class which is
 /// used as an ASTMatcher callback. Also within this file is a helper AST
 /// visitor class used to identify sequences of explicit casts.
 ///
 //===----------------------------------------------------------------------===//
 
-#include "TransformationTemplateActions.h"
-#include "TransformationTemplateMatchers.h"
+#include "RenameVariableActions.h"
+#include "RenameVariableMatchers.h"
 
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/RecursiveASTVisitor.h"
@@ -40,7 +40,7 @@ void ReplaceWith(Transform &Owner, SourceManager &SM,
 
   CharSourceRange Range(SourceRange(StartLoc, EndLoc), true);
 
-  string source_text = getString( argument, SM );
+  string source_text = "new_name";
   string replacement = source_text; 
 
   if ( isReplaceableRange( StartLoc, EndLoc, SM, Owner ) ){ 
@@ -49,22 +49,25 @@ void ReplaceWith(Transform &Owner, SourceManager &SM,
 }
 }
 
-TransformationTemplateFixer::TransformationTemplateFixer(unsigned &AcceptedChanges,
+RenameVariableFixer::RenameVariableFixer(unsigned &AcceptedChanges,
                            Transform &Owner)
     : AcceptedChanges(AcceptedChanges), Owner(Owner) {
 }
 
 
-void TransformationTemplateFixer::run(const ast_matchers::MatchFinder::MatchResult &Result) {
+void RenameVariableFixer::run(const ast_matchers::MatchFinder::MatchResult &Result) {
   using namespace std;
   ASTContext& context = *Result.Context;
   SourceManager& SM = context.getSourceManager();
 
-  auto node = Result.Nodes.getNodeAs<BinaryOperator>(MatcherTransformationTemplateID);
+  const auto* node = Result.Nodes.getNodeAs<DeclRefExpr>(MatcherRenameVariableID);
   if ( node ) {
-      if ( !Owner.isInRange( node, SM ) ) return;
+      auto* value_decl = node->getDecl();
+      if ( !Owner.isInRange( value_decl, SM ) ) return;
+      
       SourceLocation StartLoc = node->getLocStart();
       SourceLocation EndLoc = node->getLocEnd();
+
       ReplaceWith( Owner, SM, StartLoc, EndLoc, context, node );
   }
 

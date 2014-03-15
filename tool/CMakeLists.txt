@@ -65,6 +65,9 @@ list(APPEND ClangModernizeSources ${CollapseIfStatementSources})
 file(GLOB_RECURSE ExtractMethodSources "../ExtractMethod/*.cpp")
 list(APPEND ClangModernizeSources ${ExtractMethodSources})
 
+file(GLOB_RECURSE RenameVariableSources "../RenameVariable/*.cpp")
+list(APPEND ClangModernizeSources ${RenameVariableSources})
+
 add_clang_executable(clang-refactor
   ${ClangModernizeSources}
   )
