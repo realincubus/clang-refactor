@@ -222,7 +222,7 @@ static CompilerVersions handleSupportedCompilers(const char *ProgName,
                                                         E = Compilers.end();
        I != E; ++I) {
     llvm::StringRef Compiler, VersionStr;
-    llvm::tie(Compiler, VersionStr) = I->split('-');
+    std::tie(Compiler, VersionStr) = I->split('-');
     Version *V = llvm::StringSwitch<Version *>(Compiler)
         .Case("clang", &RequiredVersions.Clang)
         .Case("gcc", &RequiredVersions.Gcc).Case("icc", &RequiredVersions.Icc)
@@ -332,7 +332,7 @@ int main(int argc, const char **argv) {
   cl::SetVersionPrinter(&printVersion);
 
   // Parse options and generate compilations.
-  OwningPtr<CompilationDatabase> Compilations(
+  std::unique_ptr<CompilationDatabase> Compilations(
       FixedCompilationDatabase::loadFromCommandLine(argc, argv));
   cl::ParseCommandLineOptions(argc, argv);
 
