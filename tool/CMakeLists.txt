@@ -68,6 +68,9 @@ list(APPEND ClangModernizeSources ${ExtractMethodSources})
 file(GLOB_RECURSE RenameVariableSources "../RenameVariable/*.cpp")
 list(APPEND ClangModernizeSources ${RenameVariableSources})
 
+file(GLOB_RECURSE UseVectorSources "../UseVector/*.cpp")
+list(APPEND ClangModernizeSources ${UseVectorSources})
+
 add_clang_executable(clang-refactor
   ${ClangModernizeSources}
   )
