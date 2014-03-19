@@ -71,6 +71,9 @@ list(APPEND ClangModernizeSources ${RenameVariableSources})
 file(GLOB_RECURSE UseStdArraySources "../UseStdArray/*.cpp")
 list(APPEND ClangModernizeSources ${UseStdArraySources})
 
+file(GLOB_RECURSE UseVectorSources "../UseVector/*.cpp")
+list(APPEND ClangModernizeSources ${UseVectorSources})
+
 add_clang_executable(clang-refactor
   ${ClangModernizeSources}
   )

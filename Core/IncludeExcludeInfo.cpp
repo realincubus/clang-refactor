@@ -121,7 +121,7 @@ error_code IncludeExcludeInfo::readListFromString(StringRef IncludeString,
 error_code IncludeExcludeInfo::readListFromFile(StringRef IncludeListFile,
                                                 StringRef ExcludeListFile) {
   if (!IncludeListFile.empty()) {
-      std::unique_ptr<MemoryBuffer> FileBuf;
+    std::unique_ptr<MemoryBuffer> FileBuf;
     if (error_code Err = MemoryBuffer::getFile(IncludeListFile, FileBuf)) {
       errs() << "Unable to read from include file.\n";
       return Err;
