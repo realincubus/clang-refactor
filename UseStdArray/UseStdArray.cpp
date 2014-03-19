@@ -1,4 +1,4 @@
-//===-- RenameVariable/RenameVariable.cpp - C++11 nullptr migration ---------------===//
+//===-- UseStdArray/UseStdArray.cpp - C++11 nullptr migration ---------------===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -8,14 +8,14 @@
 //===----------------------------------------------------------------------===//
 ///
 /// \file
-/// \brief This file provides the implementation of the RenameVariableTransform
+/// \brief This file provides the implementation of the UseStdArrayTransform
 /// class.
 ///
 //===----------------------------------------------------------------------===//
 
-#include "RenameVariable.h"
-#include "RenameVariableActions.h"
-#include "RenameVariableMatchers.h"
+#include "UseStdArray.h"
+#include "UseStdArrayActions.h"
+#include "UseStdArrayMatchers.h"
 #include "clang/Frontend/FrontendActions.h"
 #include "clang/Tooling/Refactoring.h"
 #include "clang/Tooling/Tooling.h"
@@ -25,22 +25,21 @@ using namespace clang::tooling;
 using namespace clang;
 namespace cl = llvm::cl;
 
-int RenameVariableTransform::apply(const CompilationDatabase &Database,
+int UseStdArrayTransform::apply(const CompilationDatabase &Database,
                                const std::vector<std::string> &SourcePaths,
 			       const llvm::cl::list<std::string>& LineRanges 
 			       ) {
   parsePositionArguments( LineRanges ); 
-  ClangTool RenameVariableTool(Database, SourcePaths);
+  ClangTool UseStdArrayTool(Database, SourcePaths);
 
   unsigned AcceptedChanges = 0;
 
   MatchFinder Finder;
-  RenameVariableFixer Fixer(AcceptedChanges, /*Owner=*/ *this);
+  UseStdArrayFixer Fixer(AcceptedChanges, /*Owner=*/ *this);
 
-  Finder.addMatcher(makeRenameVariableMatcher(), &Fixer);
-  Finder.addMatcher(makeRenameVariableMatcherDecl(), &Fixer);
+  Finder.addMatcher(makeUseStdArrayMatcher(), &Fixer);
 
-  if (int result = RenameVariableTool.run(createActionFactory(Finder))) {
+  if (int result = UseStdArrayTool.run(createActionFactory(Finder))) {
     llvm::errs() << "Error encountered during translation.\n";
     return result;
   }
@@ -50,8 +49,8 @@ int RenameVariableTransform::apply(const CompilationDatabase &Database,
   return 0;
 }
 
-struct RenameVariableFactory : TransformFactory {
-  RenameVariableFactory() {
+struct UseStdArrayFactory : TransformFactory {
+  UseStdArrayFactory() {
     Since.Clang = Version(3, 0);
     Since.Gcc = Version(4, 6);
     Since.Icc = Version(12, 1);
@@ -59,14 +58,14 @@ struct RenameVariableFactory : TransformFactory {
   }
 
   Transform *createTransform(const TransformOptions &Opts) override {
-    return new RenameVariableTransform(Opts);
+    return new UseStdArrayTransform(Opts);
   }
 };
 
 // Register the factory using this statically initialized variable.
-static TransformFactoryRegistry::Add<RenameVariableFactory>
-X("rename-variable", "renames a variable ");
+static TransformFactoryRegistry::Add<UseStdArrayFactory>
+X("use-std-array", "converts int a[100] to std::array<int,100> a;");
 
 // This anchor is used to force the linker to link in the generated object file
 // and thus register the factory.
-volatile int RenameVariableTransformAnchorSource = 0;
+volatile int UseStdArrayTransformAnchorSource = 0;

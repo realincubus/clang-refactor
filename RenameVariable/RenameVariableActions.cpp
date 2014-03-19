@@ -34,19 +34,16 @@ using namespace clang;
 using namespace TransformationUtility;
 
 namespace {
-void ReplaceWith(Transform &Owner, SourceManager &SM,
-                        SourceLocation StartLoc, SourceLocation EndLoc, const clang::ASTContext& Context, const Expr* argument ){ 
-    using namespace std;
+    void ReplaceWith(Transform &Owner, SourceManager &SM,
+			    SourceLocation StartLoc, SourceLocation EndLoc, const clang::ASTContext& Context, std::string replacement ){ 
+	using namespace std;
 
-  CharSourceRange Range(SourceRange(StartLoc, EndLoc), true);
+      CharSourceRange Range(SourceRange(StartLoc, EndLoc), true);
 
-  string source_text = "new_name";
-  string replacement = source_text; 
-
-  if ( isReplaceableRange( StartLoc, EndLoc, SM, Owner ) ){ 
-      Owner.addReplacementForCurrentTU( tooling::Replacement(SM, Range, replacement ));
-  }
-}
+      if ( isReplaceableRange( StartLoc, EndLoc, SM, Owner ) ){ 
+	  Owner.addReplacementForCurrentTU( tooling::Replacement(SM, Range, replacement ));
+      }
+    }
 }
 
 RenameVariableFixer::RenameVariableFixer(unsigned &AcceptedChanges,
@@ -60,15 +57,40 @@ void RenameVariableFixer::run(const ast_matchers::MatchFinder::MatchResult &Resu
   ASTContext& context = *Result.Context;
   SourceManager& SM = context.getSourceManager();
 
-  const auto* node = Result.Nodes.getNodeAs<DeclRefExpr>(MatcherRenameVariableID);
-  if ( node ) {
-      auto* value_decl = node->getDecl();
-      if ( !Owner.isInRange( value_decl, SM ) ) return;
-      
-      SourceLocation StartLoc = node->getLocStart();
-      SourceLocation EndLoc = node->getLocEnd();
+  {
+      const auto* node = Result.Nodes.getNodeAs<DeclRefExpr>(MatcherRenameVariableID);
+      if ( node ) {
+	  auto* value_decl = node->getDecl();
+	  if ( !Owner.isInRange( value_decl, SM ) ) return;
+	  
+	  SourceLocation StartLoc = node->getLocStart();
+	  SourceLocation EndLoc = node->getLocEnd();
 
-      ReplaceWith( Owner, SM, StartLoc, EndLoc, context, node );
+	  ReplaceWith( Owner, SM, StartLoc, EndLoc, context, "new_name" );
+      }
+  }
+
+  {
+    const VarDecl* node = Result.Nodes.getNodeAs<VarDecl>(MatcherRenameVariableDeclID);
+    if ( node ) {
+	if ( Owner.isInRange( node , SM ) ){
+#if 1
+	    auto decl_name = node->getDeclName();
+	    string decl_init_text = "";
+	    if ( node->hasInit() ){ 
+		auto decl_init = node->getInit();
+		decl_init_text = string(" = ") + getString( decl_init, SM );
+	    }
+#endif
+	    auto Range = node->getSourceRange();
+	    auto decl_type = string(" new_name 2") ;
+	    
+	    cout << "found decl" << endl;
+	    //SourceLocation StartLoc = node->getLocStart();
+	    //SourceLocation EndLoc = node->getLocEnd();
+	    ReplaceWith( Owner, SM, Range.getBegin(), Range.getEnd(), context, decl_type );
+	}
+    }
   }
 
 }

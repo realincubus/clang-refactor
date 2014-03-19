@@ -1,4 +1,4 @@
-//===-- TransformationTemplate/TransformationTemplateActions.cpp - Matcher callback ------------------===//
+//===-- UseStdArray/UseStdArrayActions.cpp - Matcher callback ------------------===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -8,14 +8,14 @@
 //===----------------------------------------------------------------------===//
 ///
 /// \file
-/// \brief This file contains the definition of the TransformationTemplateFixer class which is
+/// \brief This file contains the definition of the UseStdArrayFixer class which is
 /// used as an ASTMatcher callback. Also within this file is a helper AST
 /// visitor class used to identify sequences of explicit casts.
 ///
 //===----------------------------------------------------------------------===//
 
-#include "TransformationTemplateActions.h"
-#include "TransformationTemplateMatchers.h"
+#include "UseStdArrayActions.h"
+#include "UseStdArrayMatchers.h"
 
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/RecursiveASTVisitor.h"
@@ -35,13 +35,10 @@ using namespace TransformationUtility;
 
 namespace {
 void ReplaceWith(Transform &Owner, SourceManager &SM,
-                        SourceLocation StartLoc, SourceLocation EndLoc, const clang::ASTContext& Context, const Expr* argument ){ 
+                        SourceLocation StartLoc, SourceLocation EndLoc, const clang::ASTContext& Context, std::string replacement ){ 
     using namespace std;
 
   CharSourceRange Range(SourceRange(StartLoc, EndLoc), true);
-
-  string source_text = getString( argument, SM );
-  string replacement = source_text; 
 
   if ( isReplaceableRange( StartLoc, EndLoc, SM, Owner ) ){ 
       Owner.addReplacementForCurrentTU( tooling::Replacement(SM, Range, replacement ));
@@ -49,23 +46,38 @@ void ReplaceWith(Transform &Owner, SourceManager &SM,
 }
 }
 
-TransformationTemplateFixer::TransformationTemplateFixer(unsigned &AcceptedChanges,
+UseStdArrayFixer::UseStdArrayFixer(unsigned &AcceptedChanges,
                            Transform &Owner)
     : AcceptedChanges(AcceptedChanges), Owner(Owner) {
 }
 
 
-void TransformationTemplateFixer::run(const ast_matchers::MatchFinder::MatchResult &Result) {
+void UseStdArrayFixer::run(const ast_matchers::MatchFinder::MatchResult &Result) {
   using namespace std;
   ASTContext& context = *Result.Context;
   SourceManager& SM = context.getSourceManager();
 
-  const auto* node = Result.Nodes.getNodeAs<BinaryOperator>(MatcherTransformationTemplateID);
+  const auto* node = Result.Nodes.getNodeAs<VarDecl>(MatcherUseStdArrayID);
   if ( node ) {
       if ( !Owner.isInRange( node, SM ) ) return;
-      SourceLocation StartLoc = node->getLocStart();
-      SourceLocation EndLoc = node->getLocEnd();
-      ReplaceWith( Owner, SM, StartLoc, EndLoc, context, node );
+      
+      auto name = node->getNameAsString();
+      auto qual_type = node->getType();
+      auto* type = dyn_cast<const ConstantArrayType>(qual_type.getTypePtr());
+      assert( type && "type is null" );
+
+      auto size = type->getSize();    
+      auto element_qual_type = type->getElementType();
+      //auto* element_type = element_qual_type.getTypePtr();
+      auto element_type_string = element_qual_type.getAsString();
+      
+      auto type_loc = node->getTypeSourceInfo()->getTypeLoc();
+
+      auto Range = type_loc.getSourceRange();
+
+      auto replacement = string("std::array<") + element_type_string + string(",") + size.toString(10,true) + string("> ") + name;
+
+      ReplaceWith( Owner, SM, Range.getBegin(), Range.getEnd(), context, replacement );
   }
 
 }

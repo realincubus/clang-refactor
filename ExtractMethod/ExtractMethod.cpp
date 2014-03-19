@@ -43,7 +43,6 @@ int ExtractMethodTransform::apply(const CompilationDatabase &Database,
     llvm::errs() << "Error encountered during translation.\n";
     return result;
   }
-  //ExtractMethodFixer FixerCompound(AcceptedChanges, /*Owner=*/ *this);
   MatchFinder FinderCompound;
   FinderCompound.addMatcher(makeExtractMethodMatcherCompound(), &Fixer);
 
@@ -51,21 +50,6 @@ int ExtractMethodTransform::apply(const CompilationDatabase &Database,
     llvm::errs() << "Error encountered during translation.\n";
     return result;
   }
-
-  // TODO generate the funtion here and place it somewhere
-  llvm::errs() << "void function ( "; 
-  for( auto it = Fixer.ExtractedParameters.begin(), end = Fixer.ExtractedParameters.end() ; it != end ; it++ ){
-      if ( distance(it,end) == 1 ) {
-	llvm::errs() << *it;
-      }else{
-	llvm::errs() << *it << ", ";
-      }
-  }
-  llvm::errs() << " ){\n";
-  llvm::errs() << Fixer.ExtractedStatements << "\n" ;
-  llvm::errs() << "}\n";
-
-  
 
   setAcceptedChanges(AcceptedChanges);
 

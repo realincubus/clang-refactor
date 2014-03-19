@@ -1,4 +1,4 @@
-//===-- RenameVariable/RenameVariableMatchers.cpp - Matchers for null casts ----------===//
+//===-- UseStdArray/UseStdArrayMatchers.cpp - Matchers for null casts ----------===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -13,25 +13,23 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#include "RenameVariableMatchers.h"
+#include "UseStdArrayMatchers.h"
 #include "clang/AST/ASTContext.h"
 
 using namespace clang::ast_matchers;
 using namespace clang;
 
-const char *MatcherRenameVariableID = "matcherRenameVariableID";
-const char *MatcherRenameVariableDeclID = "matcherRenameVariableDeclID";
+const char *MatcherUseStdArrayID = "matcherUseStdArrayID";
 
 
-StatementMatcher makeRenameVariableMatcher(){
-    return declRefExpr().bind(MatcherRenameVariableID);
+DeclarationMatcher makeUseStdArrayMatcher(){
+    return varDecl(
+	    hasType(
+		constantArrayType()
+	    )
+	   ).bind(MatcherUseStdArrayID);
 }
 
-#if 1
-DeclarationMatcher makeRenameVariableMatcherDecl(){
-    return namedDecl().bind(MatcherRenameVariableDeclID);
-}
-#endif
 
 
 

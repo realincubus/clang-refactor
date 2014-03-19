@@ -76,13 +76,29 @@ void ExtractMethodFixer::run(const ast_matchers::MatchFinder::MatchResult &Resul
 		 // is realy outside ?
 		 if ( !Owner.isInRange( node->getDecl(), SM ) ){
 		     // fill type and name
-		     std::string parameter_type = node->getDecl()->getType().getAsString();
+		     std::string parameter_type = node->getDecl()->getType().getAsString() + string("&");
 		     std::string parameter_name = getString(node,SM);
 		     std::string parameter_text = parameter_type + string(" ") + parameter_name;
 		     ExtractedParameters.push_back( parameter_text );
 		     ExtractedArguments.push_back( parameter_name );
 		     OutsideDeclares.push_back( node->getDecl() );
 		 }
+	     }
+	  }else{
+	     // TODO hadle case that somethings refereces a declare that will be extracted
+	     // possible solution :
+	     //	remove text for declare from method extract and place it before function call
+	     //	possible problem :
+	     //	
+	     //	int a = 0;
+	     //	int b = a;
+	     //
+	     //	b = b + 1;
+	     //
+	     //	b will then be initialized by a non defined variable a
+	     //
+	     if ( Owner.isInRange( node->getDecl(), SM ) ){
+		 exit(-1);
 	     }
 	  }
       }

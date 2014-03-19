@@ -5,7 +5,7 @@ set (ClangModernizeSources
   )
 
 # FIXME: Lib-ify the transforms to simplify the build rules.
-SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11" )
+SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Og" )
 
 # For each transform subdirectory.
 #file(GLOB_RECURSE LoopConvertSources "../LoopConvert/*.cpp")
@@ -67,6 +67,9 @@ list(APPEND ClangModernizeSources ${ExtractMethodSources})
 
 file(GLOB_RECURSE RenameVariableSources "../RenameVariable/*.cpp")
 list(APPEND ClangModernizeSources ${RenameVariableSources})
+
+file(GLOB_RECURSE UseStdArraySources "../UseStdArray/*.cpp")
+list(APPEND ClangModernizeSources ${UseStdArraySources})
 
 add_clang_executable(clang-refactor
   ${ClangModernizeSources}
