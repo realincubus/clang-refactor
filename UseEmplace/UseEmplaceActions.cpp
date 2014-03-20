@@ -35,13 +35,10 @@ using namespace TransformationUtility;
 
 namespace {
 void ReplaceWith(Transform &Owner, SourceManager &SM,
-    SourceLocation StartLoc, SourceLocation EndLoc, const clang::ASTContext& Context, const Expr* argument ){ 
+    SourceLocation StartLoc, SourceLocation EndLoc, const clang::ASTContext& Context, std::string replacement ){ 
     using namespace std;
 
   CharSourceRange Range(SourceRange(StartLoc, EndLoc), true);
-
-  string source_text = getString( argument, SM );
-  string replacement = source_text; 
 
   if ( isReplaceableRange( StartLoc, EndLoc, SM, Owner ) ){ 
       Owner.addReplacementForCurrentTU( tooling::Replacement(SM, Range, replacement ));
@@ -65,15 +62,36 @@ void UseEmplaceFixer::run(const ast_matchers::MatchFinder::MatchResult &Result) 
       cout << "found node " << endl;
       if ( !Owner.isInRange( node, SM ) ) return;
     
+      // this changes the function call
+      {
+	  auto* callee = node->getCallee();
+	  callee->dumpColor();
+	  auto* member_expr = dyn_cast_or_null<MemberExpr>(callee);
+	  auto member_loc = member_expr->getMemberLoc();
+	  
+	  SourceLocation StartLoc = member_loc;
+	  SourceLocation EndLoc = member_loc;
+	  ReplaceWith( Owner, SM, StartLoc, EndLoc, context, "emplace_back" );
+      }
+
+      // this changes the argument
       auto* arg0 = node->getArg( 0 );
-
-      arg0->dumpColor();
-
       auto* materialize_temporary_expr = dyn_cast_or_null<MaterializeTemporaryExpr>(arg0);
+      auto* temp_expr = materialize_temporary_expr->GetTemporaryExpr();
+      auto* bind_expr = dyn_cast_or_null<CXXBindTemporaryExpr>(temp_expr);
+      auto* constructor_call = dyn_cast_or_null<CXXConstructExpr>(bind_expr->getSubExpr()); 
+      string arguments_text = "";
+      for( unsigned int i = 0, end = constructor_call->getNumArgs(); i < end ; i++ ){
+	  if ( i + 1 == end ){
+	    arguments_text += getString( constructor_call->getArg(i), SM ); 
+	  }else{
+	    arguments_text += getString( constructor_call->getArg(i), SM ) + string(","); 
+	  }
+      }
       
-      SourceLocation StartLoc = node->getLocStart();
-      SourceLocation EndLoc = node->getLocEnd();
-      ReplaceWith( Owner, SM, StartLoc, EndLoc, context, node );
+      SourceLocation StartLoc = materialize_temporary_expr->getLocStart();
+      SourceLocation EndLoc = materialize_temporary_expr->getLocEnd();
+      ReplaceWith( Owner, SM, StartLoc, EndLoc, context, arguments_text );
   }
 
 }
