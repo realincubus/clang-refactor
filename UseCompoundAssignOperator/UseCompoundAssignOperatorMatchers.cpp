@@ -30,7 +30,15 @@ StatementMatcher makeUseCompoundAssignOperatorMatcher(){
 			hasOperatorName("+"),
 			hasOperatorName("*"),
 			hasOperatorName("-"),
-			hasOperatorName("/")
+			hasOperatorName("/"),
+			hasOperatorName("%"),
+			hasOperatorName("<<"),
+			hasOperatorName(">>"),
+			hasOperatorName("&"),
+			hasOperatorName("&"),
+			hasOperatorName("^"),
+			hasOperatorName("|")
+
 		    )
 		)
 	      )
