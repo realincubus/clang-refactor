@@ -31,14 +31,15 @@ StatementMatcher makeUseCompoundAssignOperatorMatcher(){
 			hasOperatorName("*"),
 			hasOperatorName("-"),
 			hasOperatorName("/"),
-			hasOperatorName("%"),
+			hasOperatorName("%")
+#if 0
 			hasOperatorName("<<"),
 			hasOperatorName(">>"),
 			hasOperatorName("&"),
 			hasOperatorName("&"),
 			hasOperatorName("^"),
 			hasOperatorName("|")
-
+#endif
 		    )
 		)
 	      )

@@ -77,6 +77,9 @@ list(APPEND ClangModernizeSources ${UseVectorSources})
 file(GLOB_RECURSE UseEmplaceSources "../UseEmplace/*.cpp")
 list(APPEND ClangModernizeSources ${UseEmplaceSources})
 
+file(GLOB_RECURSE UnInvertLogicSources "../UnInvertLogic/*.cpp")
+list(APPEND ClangModernizeSources ${UnInvertLogicSources})
+
 add_clang_executable(clang-refactor
   ${ClangModernizeSources}
   )
