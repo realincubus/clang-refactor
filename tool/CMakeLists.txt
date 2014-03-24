@@ -80,6 +80,9 @@ list(APPEND ClangModernizeSources ${UseEmplaceSources})
 file(GLOB_RECURSE UnInvertLogicSources "../UnInvertLogic/*.cpp")
 list(APPEND ClangModernizeSources ${UnInvertLogicSources})
 
+file(GLOB_RECURSE RemoveRedundantConditionalSources "../RemoveRedudantConditional/*.cpp")
+list(APPEND ClangModernizeSources ${RemoveRedundantConditionalSources})
+
 add_clang_executable(clang-refactor
   ${ClangModernizeSources}
   )
