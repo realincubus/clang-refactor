@@ -86,6 +86,9 @@ list(APPEND ClangModernizeSources ${RemoveRedundantConditionalSources})
 file(GLOB_RECURSE UseEmptySources "../UseEmpty/*.cpp")
 list(APPEND ClangModernizeSources ${UseEmptySources})
 
+file(GLOB_RECURSE PullTemporariesSources "../PullTemporaries/*.cpp")
+list(APPEND ClangModernizeSources ${PullTemporariesSources})
+
 add_clang_executable(clang-refactor
   ${ClangModernizeSources}
   )
