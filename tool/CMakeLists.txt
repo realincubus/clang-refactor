@@ -89,6 +89,9 @@ list(APPEND ClangModernizeSources ${UseEmptySources})
 file(GLOB_RECURSE PullTemporariesSources "../PullTemporaries/*.cpp")
 list(APPEND ClangModernizeSources ${PullTemporariesSources})
 
+file(GLOB_RECURSE UseRAIISources "../UseRAII/*.cpp")
+list(APPEND ClangModernizeSources ${UseRAIISources})
+
 add_clang_executable(clang-refactor
   ${ClangModernizeSources}
   )

@@ -47,6 +47,16 @@ void ReplaceWith(Transform &Owner, SourceManager &SM,
       Owner.addReplacementForCurrentTU( tooling::Replacement(SM, Range, replacement ));
   }
 }
+void ReplaceWith(Transform &Owner, SourceManager &SM,
+                        SourceLocation StartLoc, SourceLocation EndLoc, const clang::ASTContext& Context, std::string replacement ){ 
+    using namespace std;
+
+  CharSourceRange Range(SourceRange(StartLoc, EndLoc), true);
+
+  if ( isReplaceableRange( StartLoc, EndLoc, SM, Owner ) ){ 
+      Owner.addReplacementForCurrentTU( tooling::Replacement(SM, Range, replacement ));
+  }
+}
 }
 
 PullTemporariesFixer::PullTemporariesFixer(unsigned &AcceptedChanges,
@@ -59,6 +69,7 @@ void PullTemporariesFixer::run(const ast_matchers::MatchFinder::MatchResult &Res
   using namespace std;
   ASTContext& context = *Result.Context;
   SourceManager& SM = context.getSourceManager();
+  //static list<Decl*> removed_declares;
 
   const auto* node = Result.Nodes.getNodeAs<DeclRefExpr>(MatcherPullTemporariesID);
   if ( node ) {
@@ -75,13 +86,22 @@ void PullTemporariesFixer::run(const ast_matchers::MatchFinder::MatchResult &Res
 	  // TODO put this into the matcher
 	  if ( !var_decl->hasInit() ) return;
 	  auto* init = var_decl->getInit();
-	  SourceLocation StartLoc = node->getLocStart();
-	  SourceLocation EndLoc = node->getLocEnd();
-	  ReplaceWith( Owner, SM, StartLoc, EndLoc, context, init );
+	  {
+	      SourceLocation StartLoc = node->getLocStart();
+	      SourceLocation EndLoc = node->getLocEnd();
+	      ReplaceWith( Owner, SM, StartLoc, EndLoc, context, init );
+	  }
+
+	  {
+	      SourceLocation StartLoc = var_decl->getLocStart();
+	      SourceLocation EndLoc = var_decl->getLocEnd();
+	      ReplaceWith( Owner, SM,StartLoc, EndLoc, context, "" );
+	  }
       }
 
   }
   // TODO replace the declare with nothing 
+  
 
 }
 

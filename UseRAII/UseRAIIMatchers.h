@@ -20,6 +20,8 @@
 
 // Names to bind with matched expressions.
 extern const char *MatcherUseRAIIID;
+extern const char *MatcherDeclRef;
+extern const char *MatcherBinOp;
 
 /// \brief Create a matcher that finds implicit casts as well as the head of a
 /// sequence of zero or more nested explicit casts that have an implicit cast

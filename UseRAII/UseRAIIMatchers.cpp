@@ -20,10 +20,37 @@ using namespace clang::ast_matchers;
 using namespace clang;
 
 const char *MatcherUseRAIIID = "matcherUseRAIIID";
+const char *MatcherDeclRef = "matcherDeclRef";
+const char *MatcherBinOp = "matcherBinOp";
 
 
 StatementMatcher makeUseRAIIMatcher(){
-    return anything().bind(MatcherUseRAIIID);
+#if 0
+    return binaryOperator(
+		hasLHS(
+		    declRefExpr()
+		    )
+	    ).bind(MatcherUseRAIIID);
+#endif
+#if 1
+    return compoundStmt(
+	    forEach(
+	    //hasDescendant(
+		binaryOperator(
+		    hasOperatorName("="),
+		    hasLHS(
+			declRefExpr(
+			    
+			).bind(MatcherDeclRef)
+		    ),
+		    hasRHS(
+			anything()
+		    )
+		).bind(MatcherBinOp)
+	    )
+	    
+    ).bind(MatcherUseRAIIID);
+#endif
 }
 
 

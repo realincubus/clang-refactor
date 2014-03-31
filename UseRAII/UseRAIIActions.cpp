@@ -33,15 +33,68 @@ using namespace clang;
 
 using namespace TransformationUtility;
 
+#if 0
+class RedundantLocalVariableRule
+{
+private:
+    NamedDecl *extractReturnDeclRef(CompoundStmt *compoundStmt)
+    {
+        Stmt *lastStmt = (Stmt *)*(compoundStmt->body_end() - 1);
+        ReturnStmt *returnStmt = dyn_cast<ReturnStmt>(lastStmt);
+        if (returnStmt)
+        {
+            ImplicitCastExpr *implicitCastExpr =
+                dyn_cast_or_null<ImplicitCastExpr>(returnStmt->getRetValue());
+            if (implicitCastExpr)
+            {
+                DeclRefExpr *returnExpr =
+                    dyn_cast_or_null<DeclRefExpr>(implicitCastExpr->getSubExpr());
+                if (returnExpr)
+                {
+                    return returnExpr->getFoundDecl();
+                }
+
+            }
+        }
+        return nullptr;
+    }
+
+    NamedDecl *extractNamedDecl(CompoundStmt *compoundStmt)
+    {
+        Stmt *lastSecondStmt = (Stmt *)*(compoundStmt->body_end() - 2);
+        DeclStmt *declStmt = dyn_cast<DeclStmt>(lastSecondStmt);
+        if (declStmt && declStmt->isSingleDecl())
+        {
+            return dyn_cast<NamedDecl>(declStmt->getSingleDecl());
+        }
+        return nullptr;
+    }
+
+public:
+
+    bool VisitCompoundStmt(CompoundStmt *compoundStmt)
+    {
+        if (compoundStmt->size() >= 2)
+        {
+            NamedDecl *returnDeclRef = extractReturnDeclRef(compoundStmt);
+            NamedDecl *namedDecl = extractNamedDecl(compoundStmt);
+            if (returnDeclRef && namedDecl && returnDeclRef->getName().equals(namedDecl->getName()))
+            {
+                //addViolation(namedDecl, this);
+            }
+        }
+
+        return true;
+    }
+};
+#endif
+
 namespace {
 void ReplaceWith(Transform &Owner, SourceManager &SM,
-                        SourceLocation StartLoc, SourceLocation EndLoc, const clang::ASTContext& Context, const Expr* argument ){ 
+                        SourceLocation StartLoc, SourceLocation EndLoc, const clang::ASTContext& Context, std::string replacement ){ 
     using namespace std;
 
   CharSourceRange Range(SourceRange(StartLoc, EndLoc), true);
-
-  string source_text = getString( argument, SM );
-  string replacement = source_text; 
 
   if ( isReplaceableRange( StartLoc, EndLoc, SM, Owner ) ){ 
       Owner.addReplacementForCurrentTU( tooling::Replacement(SM, Range, replacement ));
@@ -60,13 +113,79 @@ void UseRAIIFixer::run(const ast_matchers::MatchFinder::MatchResult &Result) {
   ASTContext& context = *Result.Context;
   SourceManager& SM = context.getSourceManager();
 
-  const auto* node = Result.Nodes.getNodeAs<BinaryOperator>(MatcherUseRAIIID);
+#if 1
+  const auto* node = Result.Nodes.getNodeAs<CompoundStmt>(MatcherUseRAIIID);
   if ( node ) {
       if ( !Owner.isInRange( node, SM ) ) return;
-      SourceLocation StartLoc = node->getLocStart();
-      SourceLocation EndLoc = node->getLocEnd();
-      ReplaceWith( Owner, SM, StartLoc, EndLoc, context, node );
+      // TODO filter declares that are not in this compound statement
+      const auto* decl_ref = Result.Nodes.getNodeAs<DeclRefExpr>(MatcherDeclRef);
+
+      cout << "searching binary operator " << endl;
+      // TODO determin stmts position inside the compound stmt 
+      const auto* binary_operator = Result.Nodes.getNodeAs<BinaryOperator>(MatcherBinOp);
+      if ( !binary_operator ) return;
+
+      cout << getString( binary_operator, SM ) << endl;
+      decltype(node->body_begin()) position = node->body_end();
+      for( auto it = node->body_begin(), end = node->body_end(); it != end ; it++ ){
+	  if ( (*it) == binary_operator ) {
+	      position = it;
+	      break;
+	  }
+      }
+      if ( position == node->body_end() ) {
+	return;
+      }
+      cout << "found binary operator in the compound statment " << endl;
+      
+      // this does not work if it is the first statement in the compound statement
+      if ( position == node->body_begin() ) {
+	  cout << "is at the begining" << endl;	  
+	  cout << getString( binary_operator, SM ) << endl;
+	  return;
+      }
+      auto second_last = position;
+      second_last--;
+
+      auto declStmt = dyn_cast_or_null<DeclStmt>(*second_last);
+
+      if ( !(declStmt) || !declStmt->isSingleDecl() ){
+	  return;
+      }
+      cout << "second last statement is a single declaration statement " << endl;
+      auto rhs = binary_operator->getRHS();
+      if ( !rhs ) return;
+      auto single_decl = declStmt->getSingleDecl();
+      if ( !single_decl ) return;
+      auto val_dec = dyn_cast_or_null<ValueDecl>(single_decl);
+      if ( !val_dec ) return;
+
+      auto var_dec = dyn_cast_or_null<VarDecl>(val_dec);
+      if ( !var_dec ) return;
+      if ( var_dec->isStaticLocal() ) return;
+
+      if ( val_dec != decl_ref->getDecl() ) return;
+
+      // add the initializer to the declare
+      {
+
+	  SourceLocation StartLoc = single_decl->getLocStart();
+	  SourceLocation EndLoc = single_decl->getLocEnd();
+	  string replacement = getString( single_decl, SM ) + string(" = ") + getString( rhs, SM );
+	  cout << "replacing " << endl;
+	  ReplaceWith( Owner, SM, StartLoc, EndLoc, context, replacement );
+	  cout << "done replacing " << endl;
+      }
+      // remove the assign statement
+      {
+	  SourceLocation StartLoc = binary_operator->getLocStart();
+	  SourceLocation EndLoc = binary_operator->getLocEnd();
+	  cout << "replacing 2" << endl;
+	  ReplaceWith( Owner, SM, StartLoc, EndLoc, context, "" );
+	  cout << "done replacing 2" << endl;
+      }
   }
+#endif
 
 }
 

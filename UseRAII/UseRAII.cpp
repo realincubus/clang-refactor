@@ -64,7 +64,7 @@ struct UseRAIIFactory : TransformFactory {
 
 // Register the factory using this statically initialized variable.
 static TransformFactoryRegistry::Add<UseRAIIFactory>
-X( , "fill in");
+X( "use-raii", "fill in");
 
 // This anchor is used to force the linker to link in the generated object file
 // and thus register the factory.

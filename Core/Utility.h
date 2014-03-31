@@ -18,9 +18,10 @@ namespace TransformationUtility {
 	return Lexer::getSourceText( CharSourceRange::getTokenRange(sr), SM, LangOptions());
     }
 
-    static std::string getString( const Stmt* expr , const SourceManager& SM ){
-	SourceLocation expr_start = expr->getLocStart();
-	SourceLocation expr_end = expr->getLocEnd();
+    template< typename T >
+    static std::string getString( const T* node , const SourceManager& SM ){
+	SourceLocation expr_start = node->getLocStart();
+	SourceLocation expr_end = node->getLocEnd();
 	return Lexer::getSourceText( CharSourceRange::getTokenRange(SourceRange(expr_start, expr_end)), SM, LangOptions());
     }
 
