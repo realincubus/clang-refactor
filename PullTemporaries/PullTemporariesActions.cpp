@@ -76,7 +76,7 @@ void PullTemporariesFixer::run(const ast_matchers::MatchFinder::MatchResult &Res
       if ( !Owner.isInRange( node, SM ) ) return;
       auto* value_decl = node->getDecl();
       auto name = value_decl->getNameAsString();
-      auto it_found = name.find("temp_rvalue");
+      auto it_found = name.find("temp_");
       if ( it_found != string::npos ) {
 	  // thats ok for now 
 	  // TODO put this into the matcher

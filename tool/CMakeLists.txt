@@ -92,6 +92,9 @@ list(APPEND ClangModernizeSources ${PullTemporariesSources})
 file(GLOB_RECURSE UseRAIISources "../UseRAII/*.cpp")
 list(APPEND ClangModernizeSources ${UseRAIISources})
 
+file(GLOB_RECURSE UseLocalIteratorInForLoopSources "../UseLocalIteratorInForLoop/*.cpp")
+list(APPEND ClangModernizeSources ${UseLocalIteratorInForLoopSources})
+
 add_clang_executable(clang-refactor
   ${ClangModernizeSources}
   )
