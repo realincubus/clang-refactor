@@ -20,8 +20,10 @@ using namespace clang::ast_matchers;
 using namespace clang;
 
 const char *MatcherUseLocalIteratorInForLoopID = "matcherUseLocalIteratorInForLoopID";
+const char *MatcherForStmtID = "matcherForStmtID";
+const char *MatcherDeclRefID = "matcherDeclRefID";
 
-
+#if 0
 StatementMatcher makeUseLocalIteratorInForLoopMatcher(){
     return forStmt(
 	    hasLoopInit(
@@ -34,6 +36,25 @@ StatementMatcher makeUseLocalIteratorInForLoopMatcher(){
 	    )
     );
 }
+#endif
+
+DeclarationMatcher makeUseLocalIteratorInForLoopMatcher(){
+    return functionDecl(
+	    forEachDescendant(
+		forStmt(
+		    hasLoopInit(
+			binaryOperator(
+			    hasLHS(
+				declRefExpr().bind(MatcherDeclRefID)
+			    )
+			)
+		    )
+		).bind(MatcherForStmtID)	    
+	    )
+    ).bind(MatcherUseLocalIteratorInForLoopID);
+}
+
+
 
 
 

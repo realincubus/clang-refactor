@@ -14,11 +14,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "UseLocalIteratorInForLoop.h"
-#include "UseLocalIteratorInForLoopActions.h"
 #include "UseLocalIteratorInForLoopMatchers.h"
 #include "clang/Frontend/FrontendActions.h"
 #include "clang/Tooling/Refactoring.h"
 #include "clang/Tooling/Tooling.h"
+#include "clang/Frontend/CompilerInstance.h"
 
 using clang::ast_matchers::MatchFinder;
 using namespace clang::tooling;
@@ -37,6 +37,8 @@ int UseLocalIteratorInForLoopTransform::apply(const CompilationDatabase &Databas
   MatchFinder Finder;
   UseLocalIteratorInForLoopFixer Fixer(AcceptedChanges, /*Owner=*/ *this);
 
+  this->Fixer = &Fixer;
+
   Finder.addMatcher(makeUseLocalIteratorInForLoopMatcher(), &Fixer);
 
   if (int result = UseLocalIteratorInForLoopTool.run(createActionFactory(Finder))) {
@@ -47,6 +49,13 @@ int UseLocalIteratorInForLoopTransform::apply(const CompilationDatabase &Databas
   setAcceptedChanges(AcceptedChanges);
 
   return 0;
+}
+
+bool UseLocalIteratorInForLoopTransform::handleBeginSource(clang::CompilerInstance &CI,
+	                                             llvm::StringRef Filename) {
+        assert(Fixer != NULL && "Fixer must be set");
+        Fixer->setPreprocessor(CI.getPreprocessor());
+	  return Transform::handleBeginSource(CI, Filename);
 }
 
 struct UseLocalIteratorInForLoopFactory : TransformFactory {

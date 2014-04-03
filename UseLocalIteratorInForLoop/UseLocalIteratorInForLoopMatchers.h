@@ -20,12 +20,15 @@
 
 // Names to bind with matched expressions.
 extern const char *MatcherUseLocalIteratorInForLoopID;
+extern const char *MatcherForStmtID;
+extern const char *MatcherDeclRefID;
 
 /// \brief Create a matcher that finds implicit casts as well as the head of a
 /// sequence of zero or more nested explicit casts that have an implicit cast
 /// to null within.
 /// Finding sequences of explict casts is necessary so that an entire sequence
 /// can be replaced instead of just the inner-most implicit cast.
-clang::ast_matchers::StatementMatcher makeUseLocalIteratorInForLoopMatcher();
+//clang::ast_matchers::StatementMatcher makeUseLocalIteratorInForLoopMatcher();
+clang::ast_matchers::DeclarationMatcher makeUseLocalIteratorInForLoopMatcher();
 
 #endif // CLANG_MODERNIZE_USE_NULLPTR_MATCHERS_H
