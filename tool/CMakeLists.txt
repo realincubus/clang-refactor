@@ -98,6 +98,9 @@ list(APPEND ClangModernizeSources ${UseLocalIteratorInForLoopSources})
 file(GLOB_RECURSE MoveToFirstUsageSources "../MoveToFirstUsage/*.cpp")
 list(APPEND ClangModernizeSources ${MoveToFirstUsageSources})
 
+file(GLOB_RECURSE UseConstSources "../UseConst/*.cpp")
+list(APPEND ClangModernizeSources ${UseConstSources})
+
 add_clang_executable(clang-refactor
   ${ClangModernizeSources}
   )
