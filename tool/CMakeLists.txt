@@ -101,6 +101,9 @@ list(APPEND ClangModernizeSources ${MoveToFirstUsageSources})
 file(GLOB_RECURSE UseConstSources "../UseConst/*.cpp")
 list(APPEND ClangModernizeSources ${UseConstSources})
 
+file(GLOB_RECURSE ForLoopStartFromZeroSources "../ForLoopStartFromZero/*.cpp")
+list(APPEND ClangModernizeSources ${ForLoopStartFromZeroSources})
+
 add_clang_executable(clang-refactor
   ${ClangModernizeSources}
   )
