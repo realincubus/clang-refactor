@@ -1,4 +1,4 @@
-//===-- ForLoopStartFromZero/ForLoopStartFromZeroActions.cpp - Matcher callback ------------------===//
+//===-- UseAlgorithms/UseAlgorithmsActions.cpp - Matcher callback ------------------===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -8,14 +8,14 @@
 //===----------------------------------------------------------------------===//
 ///
 /// \file
-/// \brief This file contains the definition of the ForLoopStartFromZeroFixer class which is
+/// \brief This file contains the definition of the UseAlgorithmsFixer class which is
 /// used as an ASTMatcher callback. Also within this file is a helper AST
 /// visitor class used to identify sequences of explicit casts.
 ///
 //===----------------------------------------------------------------------===//
 
-#include "ForLoopStartFromZeroActions.h"
-#include "ForLoopStartFromZeroMatchers.h"
+#include "UseAlgorithmsActions.h"
+#include "UseAlgorithmsMatchers.h"
 
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/RecursiveASTVisitor.h"
@@ -46,26 +46,48 @@ void ReplaceWith(Transform &Owner, SourceManager &SM,
 }
 }
 
-ForLoopStartFromZeroFixer::ForLoopStartFromZeroFixer(unsigned &AcceptedChanges,
+UseAlgorithmsFixer::UseAlgorithmsFixer(unsigned &AcceptedChanges,
                            Transform &Owner)
     : AcceptedChanges(AcceptedChanges), Owner(Owner) {
 }
 
 
-void ForLoopStartFromZeroFixer::run(const ast_matchers::MatchFinder::MatchResult &Result) {
+void UseAlgorithmsFixer::run(const ast_matchers::MatchFinder::MatchResult &Result) {
   using namespace std;
   ASTContext& context = *Result.Context;
   SourceManager& SM = context.getSourceManager();
 
-  const auto* node = Result.Nodes.getNodeAs<DeclRefExpr>(MatcherForLoopStartFromZeroID);
-  const auto* literal = Result.Nodes.getNodeAs<IntegerLiteral>(MatcherInitID);
-  const auto* loop_var = Result.Nodes.getNodeAs<DeclRefExpr>(MatcherForLoopVariableID);
+  const auto* node = Result.Nodes.getNodeAs<ForStmt>(MatcherUseAlgorithmsID);
   if ( node ) {
-      llvm::errs() << "found a node\n" ;
       if ( !Owner.isInRange( node, SM ) ) return;
       SourceLocation StartLoc = node->getLocStart();
       SourceLocation EndLoc = node->getLocEnd();
-      string replacement = string(" (") + getString( node, SM ) + string(" + ") + getString( literal , SM ) + string(") ");
+
+      auto array_subscript = Result.Nodes.getNodeAs<ArraySubscriptExpr>("array");
+      auto array_name = getString( array_subscript->getBase(), SM );
+      auto array_lb_node = Result.Nodes.getNodeAs<IntegerLiteral>("start_int");
+      auto array_low = getString( array_lb_node, SM );
+      auto array_ub_node = Result.Nodes.getNodeAs<IntegerLiteral>("end_int");
+      auto array_up = getString( array_ub_node, SM );
+
+      auto fill_int_node = Result.Nodes.getNodeAs<IntegerLiteral>("fill_int");
+      string last_arg_text;
+      string algorithm_used;
+      if ( fill_int_node ) {
+	algorithm_used = "std::fill";
+	last_arg_text = getString( fill_int_node, SM );
+      }
+
+      auto iota_node = Result.Nodes.getNodeAs<DeclRefExpr>("iota_var");
+      if ( iota_node ) {
+	algorithm_used = "std::iota";
+	last_arg_text = array_low;
+      }
+
+      string replacement = algorithm_used + string("(")  
+			    + array_name + string("[") + array_low + string("], ") 
+			    + array_name + string("[") + array_up  + string("], ") + last_arg_text 
+			    + string(")");
       ReplaceWith( Owner, SM, StartLoc, EndLoc, context, replacement );
   }
 

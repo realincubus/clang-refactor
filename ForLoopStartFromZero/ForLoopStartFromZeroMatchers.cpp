@@ -21,6 +21,7 @@ using namespace clang;
 
 const char *MatcherForLoopStartFromZeroID = "matcherForLoopStartFromZeroID";
 const char *MatcherForLoopVariableID = "matcherForLoopVariableID";
+const char *MatcherInitID = "matcherInitID";
 
 // TODO has to have a single init statement 
 // TODO has to have a single init statement with an assign initializer with a literal integer 
@@ -37,7 +38,7 @@ StatementMatcher makeForLoopStartFromZeroMatcher(){
 			   varDecl(
 			       hasInitializer(
 				   ignoringParenImpCasts(
-					integerLiteral().bind("init")
+					integerLiteral().bind(MatcherInitID) // TODO -> 0
 				   )
 			       )
 			   ).bind(MatcherForLoopVariableID)
@@ -54,7 +55,7 @@ StatementMatcher makeForLoopStartFromZeroMatcher(){
 		       ),
 		       hasRHS(
 			    ignoringParenImpCasts(
-				integerLiteral().bind("init")
+				integerLiteral().bind(MatcherInitID) // TODO -> 0 
 			    )
 		       )
 		   )
@@ -62,7 +63,7 @@ StatementMatcher makeForLoopStartFromZeroMatcher(){
 	   ),
 	   hasCondition(
 		binaryOperator(
-		    hasOperatorName("<=")
+		    hasOperatorName("<=") // TODO -> <
 		)
 	   )
 #if 1
@@ -73,27 +74,34 @@ StatementMatcher makeForLoopStartFromZeroMatcher(){
 			to(
 			    decl(
 #if 1
-				equalsBoundNode(MatcherForLoopVariableID),
-				hasParent(
-				    binaryOperator(
-					hasOperatorName("-"),
-					hasRHS(
-					    ignoringParenImpCasts(
-						integerLiteral(
-						    equalsBoundNode("init")
-						)
-					    )
+				equalsBoundNode(MatcherForLoopVariableID)
+#endif
+			    )
+			)
+#if 0
+			,
+			hasParent(
+			    binaryOperator(
+				hasOperatorName("-")
+#if 0
+				,
+				hasRHS(
+				    ignoringParenImpCasts(
+					integerLiteral(
+					    equalsBoundNode("init")
 					)
 				    )
 				)
 #endif
 			    )
 			)
-		     )
+#endif
+
+		     ).bind(MatcherForLoopStartFromZeroID)
 		)
 	   )
 #endif
-    ).bind(MatcherForLoopStartFromZeroID);
+    );
 }
 
 

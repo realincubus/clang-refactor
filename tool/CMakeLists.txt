@@ -104,6 +104,13 @@ list(APPEND ClangModernizeSources ${UseConstSources})
 file(GLOB_RECURSE ForLoopStartFromZeroSources "../ForLoopStartFromZero/*.cpp")
 list(APPEND ClangModernizeSources ${ForLoopStartFromZeroSources})
 
+#file(GLOB_RECURSE UseAsyncSources "../UseAsync/*.cpp")
+#list(APPEND ClangModernizeSources ${UseAsyncSources})
+
+file(GLOB_RECURSE UseAlgorithmsSources "../UseAlgorithms/*.cpp")
+list(APPEND ClangModernizeSources ${UseAlgorithmsSources})
+
+
 add_clang_executable(clang-refactor
   ${ClangModernizeSources}
   )
