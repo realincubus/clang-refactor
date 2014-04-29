@@ -22,11 +22,8 @@ using namespace clang;
 const char *MatcherUseAlgorithmsID = "matcherUseAlgorithmsID";
 
 // TODO add a way to look through compoundstatements with only one statement in it
-
-StatementMatcher makeUseAlgorithmsMatcher(){
-    return forStmt(
-	hasLoopInit(
-	    declStmt(
+StatementMatcher makeLoopInitMatcher(){
+    return declStmt(
 		hasSingleDecl(
 		    varDecl(
 			hasInitializer(
@@ -36,17 +33,27 @@ StatementMatcher makeUseAlgorithmsMatcher(){
 			)
 		    ).bind("iterator_var")
 		)
-	    )
-	),
-	hasCondition(
-	    binaryOperator(
+	    );
+}
+
+StatementMatcher makeConditionMatcher() {
+    return binaryOperator(
 		hasOperatorName("<"),
 		hasRHS(
 		    ignoringParenImpCasts(
 			integerLiteral().bind("end_int")
 		    )
 		)
-	    )
+	    );
+}
+
+StatementMatcher makeFillandIotaMatcher(){
+    return forStmt(
+	hasLoopInit(
+	   makeLoopInitMatcher() 
+	),
+	hasCondition(
+	    makeConditionMatcher()
 	),
 	hasBody(
 	    binaryOperator(
@@ -62,11 +69,7 @@ StatementMatcher makeUseAlgorithmsMatcher(){
 			    declRefExpr(
 				to(
 				    varDecl(
-#if 1
-					// TODO this does not work
-					equalsBoundNode("iterator_var")
-#endif
-				    )
+				    ).bind("referenced_var")
 				)
 			    ).bind("iota_var")
 			)
@@ -94,8 +97,65 @@ StatementMatcher makeUseAlgorithmsMatcher(){
     ).bind(MatcherUseAlgorithmsID);
 }
 
+StatementMatcher makeIteratorReferenceMatcher() {
+    return arraySubscriptExpr(
+		hasIndex(
+		    declRefExpr().bind("iterator_ref")
+		)
+	    );
+}
 
-
+#if 1
+StatementMatcher makeCountMatcher() {
+    return forStmt(
+	hasLoopInit(
+	    makeLoopInitMatcher()
+	),
+	hasCondition(
+	    makeConditionMatcher()
+	),
+	hasBody(
+	    ifStmt(
+#if 1
+		hasTrueExpression(
+		    unaryOperator(
+			hasOperatorName("++"),
+			declRefExpr()
+		    )
+		)
+#endif
+		,
+		hasCondition(
+		    anyOf(
+			binaryOperator(
+			    hasOperatorName("=="),
+			    hasRHS(
+				ignoringParenImpCasts(
+				    integerLiteral().bind("count_this")
+				)
+			    ),
+			    hasLHS(
+				makeIteratorReferenceMatcher()
+			    )
+			),
+			binaryOperator(
+			    hasOperatorName("=="),
+			    hasRHS(
+				makeIteratorReferenceMatcher()
+			    ),
+			    hasLHS(
+				ignoringParenImpCasts(
+				    integerLiteral().bind("count_this")
+				)
+			    )
+			)
+		    )
+		)
+	    )
+	)
+    );
+}
+#endif
 
 
 

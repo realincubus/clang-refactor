@@ -57,38 +57,57 @@ void UseAlgorithmsFixer::run(const ast_matchers::MatchFinder::MatchResult &Resul
   ASTContext& context = *Result.Context;
   SourceManager& SM = context.getSourceManager();
 
-  const auto* node = Result.Nodes.getNodeAs<ForStmt>(MatcherUseAlgorithmsID);
-  if ( node ) {
-      if ( !Owner.isInRange( node, SM ) ) return;
-      SourceLocation StartLoc = node->getLocStart();
-      SourceLocation EndLoc = node->getLocEnd();
+  {
+      const auto* node = Result.Nodes.getNodeAs<ForStmt>(MatcherUseAlgorithmsID);
+      if ( node ) {
+	  if ( !Owner.isInRange( node, SM ) ) return;
+	  SourceLocation StartLoc = node->getLocStart();
+	  SourceLocation EndLoc = node->getLocEnd();
 
-      auto array_subscript = Result.Nodes.getNodeAs<ArraySubscriptExpr>("array");
-      auto array_name = getString( array_subscript->getBase(), SM );
-      auto array_lb_node = Result.Nodes.getNodeAs<IntegerLiteral>("start_int");
-      auto array_low = getString( array_lb_node, SM );
-      auto array_ub_node = Result.Nodes.getNodeAs<IntegerLiteral>("end_int");
-      auto array_up = getString( array_ub_node, SM );
+	  auto array_subscript = Result.Nodes.getNodeAs<ArraySubscriptExpr>("array");
+	  auto array_name = getString( array_subscript->getBase(), SM );
+	  auto array_lb_node = Result.Nodes.getNodeAs<IntegerLiteral>("start_int");
+	  auto array_low = getString( array_lb_node, SM );
+	  auto array_ub_node = Result.Nodes.getNodeAs<IntegerLiteral>("end_int");
+	  auto array_up = getString( array_ub_node, SM );
 
-      auto fill_int_node = Result.Nodes.getNodeAs<IntegerLiteral>("fill_int");
-      string last_arg_text;
-      string algorithm_used;
-      if ( fill_int_node ) {
-	algorithm_used = "std::fill";
-	last_arg_text = getString( fill_int_node, SM );
+	  // case fill
+	  auto fill_int_node = Result.Nodes.getNodeAs<IntegerLiteral>("fill_int");
+	  string last_arg_text;
+	  string algorithm_used;
+	  if ( fill_int_node ) {
+	    algorithm_used = "std::fill";
+	    last_arg_text = getString( fill_int_node, SM );
+	  }
+
+	  // special case iota -> fill with acesnding numbers 
+	  auto iota_var = Result.Nodes.getNodeAs<VarDecl>("referenced_var");
+	  auto iterator_var = Result.Nodes.getNodeAs<VarDecl>("iterator_var");
+	  if ( iota_var == iterator_var ){
+	      auto iota_node = Result.Nodes.getNodeAs<DeclRefExpr>("iota_var");
+	      if ( iota_node ) {
+		algorithm_used = "std::iota";
+		last_arg_text = array_low;
+	      }
+	  }
+
+	  string replacement = algorithm_used + string("(")  
+				+ string("&") + array_name + string("[") + array_low + string("], ") 
+				+ string("&") + array_name + string("[") + array_up  + string("], ") + last_arg_text 
+				+ string(")");
+	  ReplaceWith( Owner, SM, StartLoc, EndLoc, context, replacement );
       }
-
-      auto iota_node = Result.Nodes.getNodeAs<DeclRefExpr>("iota_var");
-      if ( iota_node ) {
-	algorithm_used = "std::iota";
-	last_arg_text = array_low;
+  }
+  {
+      const auto* node = Result.Nodes.getNodeAs<ForStmt>(MatcherUseAlgorithmsID);
+      if ( node ) {
+	  if ( !Owner.isInRange( node, SM ) ) return;
+	  SourceLocation StartLoc = node->getLocStart();
+	  SourceLocation EndLoc = node->getLocEnd();
+	  
+	  string replacement = "";
+	  ReplaceWith( Owner, SM, StartLoc, EndLoc, context, replacement );
       }
-
-      string replacement = algorithm_used + string("(")  
-			    + array_name + string("[") + array_low + string("], ") 
-			    + array_name + string("[") + array_up  + string("], ") + last_arg_text 
-			    + string(")");
-      ReplaceWith( Owner, SM, StartLoc, EndLoc, context, replacement );
   }
 
 }
