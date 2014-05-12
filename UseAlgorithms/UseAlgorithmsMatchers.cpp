@@ -116,15 +116,15 @@ StatementMatcher makeCountMatcher() {
 	),
 	hasBody(
 	    ifStmt(
-#if 1
+#if 0
 		hasTrueExpression(
 		    unaryOperator(
 			hasOperatorName("++"),
 			declRefExpr()
 		    )
 		)
-#endif
 		,
+#endif
 		hasCondition(
 		    anyOf(
 			binaryOperator(

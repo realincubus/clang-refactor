@@ -110,6 +110,9 @@ list(APPEND ClangModernizeSources ${ForLoopStartFromZeroSources})
 file(GLOB_RECURSE UseAlgorithmsSources "../UseAlgorithms/*.cpp")
 list(APPEND ClangModernizeSources ${UseAlgorithmsSources})
 
+file(GLOB_RECURSE UnglobalMethodSources "../UnglobalMethod/*.cpp")
+list(APPEND ClangModernizeSources ${UnglobalMethodSources})
+
 
 add_clang_executable(clang-refactor
   ${ClangModernizeSources}
