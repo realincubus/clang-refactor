@@ -46,6 +46,8 @@ int UnglobalMethodTransform::apply(const CompilationDatabase &Database,
 
   setAcceptedChanges(AcceptedChanges);
 
+  Fixer.dumpGlobalReferences();
+
   return 0;
 }
 

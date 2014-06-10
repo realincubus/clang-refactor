@@ -23,21 +23,13 @@ const char *MatcherUnglobalMethodID = "matcherUnglobalMethodID";
 
 namespace clang {
     namespace ast_matchers{
-	AST_MATCHER_P( Decl, lookup, internal::Matcher<Decl>, Internal) {
+	AST_MATCHER( VarDecl, isLocalNonStatic) {
 	    llvm::errs() << "lookup matcher called\n";
-	    const auto* ptr = dyn_cast_or_null<const DeclContext>(&Node);
-	    if ( !ptr ) {
-		llvm::errs() << "node is not a DeclContext \n" ;
-		//Node.dumpColor();
-		return false;
+	    if(Node.hasLocalStorage()) {
+		llvm::errs() << "has local storage\n";
+		return true;
 	    }
-	    for( auto declare_it = ptr->decls_begin(), end = ptr->decls_end(); 
-		    declare_it != end; 
-		    declare_it++ ){
-		if ( Internal.matches( *(*declare_it), Finder, Builder) ) {
-		    return true;
-		}
-	    }
+	    llvm::errs() << "does not have local storage\n";
 	    return false;
 	}
     }
@@ -46,14 +38,9 @@ namespace clang {
 DeclarationMatcher makeUnglobalMethodMatcher(){
     return functionDecl(
 	forEachDescendant(
-	    declRefExpr(to(decl().bind("var")))
-	),
-	hasDeclContext(
-	    lookup(
-		equalsBoundNode("var")
-	    )
+	    declRefExpr(to(varDecl(unless(isLocalNonStatic())).bind("var"))).bind(MatcherUnglobalMethodID)
 	)
-    ).bind(MatcherUnglobalMethodID);
+    );
 }
 
 
