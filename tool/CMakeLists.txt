@@ -121,9 +121,10 @@ add_clang_executable(clang-refactor
   ${ClangModernizeSources}
   )
 
+
 add_dependencies(clang-refactor
   clang-headers clang-apply-replacements
-  )
+)
 
 target_link_libraries(clang-refactor
   clangAST
@@ -138,4 +139,22 @@ target_link_libraries(clang-refactor
 
 install(TARGETS clang-refactor
   RUNTIME DESTINATION bin)
+
+add_clang_library( refactorApp
+  ${ClangModernizeSources}
+
+  LINK_LIBS
+  clangAST
+  clangASTMatchers
+  clangBasic
+  clangFrontend
+  clangLex
+  clangTooling
+  refactorCore
+)
+
+add_dependencies(refactorApp
+  clang-headers clang-apply-replacements
+)
+
 

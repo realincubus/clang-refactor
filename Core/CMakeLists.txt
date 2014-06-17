@@ -9,12 +9,13 @@ add_clang_library(refactorCore
   IncludeExcludeInfo.cpp
   PerfSupport.cpp
   IncludeDirectives.cpp
-  )
-target_link_libraries(refactorCore
+
+  LINK_LIBS
   clangAST
   clangASTMatchers
   clangBasic
   clangFrontend
   clangLex
   clangTooling
-  )
+)
+
