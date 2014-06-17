@@ -113,6 +113,9 @@ list(APPEND ClangModernizeSources ${UseAlgorithmsSources})
 file(GLOB_RECURSE UnglobalMethodSources "../UnglobalMethod/*.cpp")
 list(APPEND ClangModernizeSources ${UnglobalMethodSources})
 
+file(GLOB_RECURSE NestedIndexRenamerSources "../NestedIndexRenamer/*.cpp")
+list(APPEND ClangModernizeSources ${NestedIndexRenamerSources})
+
 
 add_clang_executable(clang-refactor
   ${ClangModernizeSources}
