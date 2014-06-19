@@ -61,6 +61,7 @@ void UseStdArrayFixer::run(const ast_matchers::MatchFinder::MatchResult &Result)
   if ( node ) {
       if ( !Owner.isInRange( node, SM ) ) return;
       
+      llvm::errs() << "found a constantArrayType\n";
       auto name = node->getNameAsString();
       auto qual_type = node->getType();
       auto* type = dyn_cast<const ConstantArrayType>(qual_type.getTypePtr());

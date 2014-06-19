@@ -168,21 +168,16 @@ void UseRAIIFixer::run(const ast_matchers::MatchFinder::MatchResult &Result) {
 
       // add the initializer to the declare
       {
-
 	  SourceLocation StartLoc = single_decl->getLocStart();
 	  SourceLocation EndLoc = single_decl->getLocEnd();
 	  string replacement = getString( single_decl, SM ) + string(" = ") + getString( rhs, SM );
-	  cout << "replacing " << endl;
 	  ReplaceWith( Owner, SM, StartLoc, EndLoc, context, replacement );
-	  cout << "done replacing " << endl;
       }
       // remove the assign statement
       {
 	  SourceLocation StartLoc = binary_operator->getLocStart();
 	  SourceLocation EndLoc = binary_operator->getLocEnd();
-	  cout << "replacing 2" << endl;
 	  ReplaceWith( Owner, SM, StartLoc, EndLoc, context, "" );
-	  cout << "done replacing 2" << endl;
       }
   }
 #endif

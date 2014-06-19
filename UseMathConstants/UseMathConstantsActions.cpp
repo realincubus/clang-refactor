@@ -54,7 +54,7 @@ UseMathConstantsFixer::UseMathConstantsFixer(unsigned &AcceptedChanges,
 }
 
 #define EPSILON 10E-7
-#define IS_SIMILAR_TO( x , y ) ( x-y < + EPSILON && x-y > -EPSILON ) 
+#define IS_SIMILAR_TO( x , y ) ( fabs(x-y) < EPSILON ) 
 
 void UseMathConstantsFixer::run(const ast_matchers::MatchFinder::MatchResult &Result) {
   using namespace std;

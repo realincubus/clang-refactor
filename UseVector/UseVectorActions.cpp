@@ -76,7 +76,7 @@ void UseVectorFixer::run(const ast_matchers::MatchFinder::MatchResult &Result) {
 	  auto element_qual_type = vla_type->getElementType();
 	  auto element_type_string = element_qual_type.getAsString();
 
-	  auto replacement = string("std::vector<") + element_type_string + string("> ") + name + string("(") + getString(size, SM) + string(") ");
+	  auto replacement = string("std::vector<") + element_type_string + string("> ") + name + string("(") + getString(size, SM) + string(")");
 
 
 	  ReplaceWith( Owner, SM, Range.getBegin(), Range.getEnd(), context, replacement );
