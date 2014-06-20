@@ -64,21 +64,37 @@ void UseStdArrayFixer::run(const ast_matchers::MatchFinder::MatchResult &Result)
       llvm::errs() << "found a constantArrayType\n";
       auto name = node->getNameAsString();
       auto qual_type = node->getType();
-      auto* type = dyn_cast<const ConstantArrayType>(qual_type.getTypePtr());
-      assert( type && "type is null" );
-
-      auto size = type->getSize();    
-      auto element_qual_type = type->getElementType();
-      //auto* element_type = element_qual_type.getTypePtr();
-      auto element_type_string = element_qual_type.getAsString();
-      
       auto type_loc = node->getTypeSourceInfo()->getTypeLoc();
-
       auto Range = type_loc.getSourceRange();
+      
+      auto* constant_array_type = dyn_cast<const ConstantArrayType>(qual_type.getTypePtr());
+      if( constant_array_type  ) {
+	  assert( constant_array_type && "constant_array_type is null" );
 
-      auto replacement = string("std::array<") + element_type_string + string(",") + size.toString(10,true) + string("> ") + name;
+	  auto size = constant_array_type->getSize();    
+	  auto element_qual_type = constant_array_type->getElementType();
+	  //auto* element_type = element_qual_type.getTypePtr();
+	  auto element_type_string = element_qual_type.getAsString();
 
-      ReplaceWith( Owner, SM, Range.getBegin(), Range.getEnd(), context, replacement );
+	  auto replacement = string("std::array<") + element_type_string + string(",") + size.toString(10,true) + string("> ") + name;
+
+	  ReplaceWith( Owner, SM, Range.getBegin(), Range.getEnd(), context, replacement );
+      }
+
+      auto* incomplete_array_type = dyn_cast_or_null<const IncompleteArrayType>(qual_type.getTypePtr());
+      if ( incomplete_array_type ){
+	  cout << "is incomplete array type " << endl;
+	  auto element_qual_type = incomplete_array_type->getElementType();
+	  auto element_type_string = element_qual_type.getAsString();
+
+	  auto init_list = node->getInit();
+	  auto init_list_text = getString( init_list , SM );
+
+	  auto replacement = string("std::array<") + element_type_string + string("> ") + name + string(" = ") + init_list_text;
+
+	  ReplaceWith( Owner, SM, Range.getBegin(), Range.getEnd(), context, replacement );
+
+      }
   }
 
 }

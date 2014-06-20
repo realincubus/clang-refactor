@@ -64,7 +64,7 @@ StatementMatcher makeForLoopStartFromZeroMatcher(){
 	   hasCondition(
 		binaryOperator(
 		    hasOperatorName("<=") // TODO -> <
-		)
+		).bind("comparism_operator")
 	   )
 #if 1
 	   ,

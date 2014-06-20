@@ -59,14 +59,37 @@ void ForLoopStartFromZeroFixer::run(const ast_matchers::MatchFinder::MatchResult
 
   const auto* node = Result.Nodes.getNodeAs<DeclRefExpr>(MatcherForLoopStartFromZeroID);
   const auto* literal = Result.Nodes.getNodeAs<IntegerLiteral>(MatcherInitID);
-  const auto* loop_var = Result.Nodes.getNodeAs<DeclRefExpr>(MatcherForLoopVariableID);
+  //const auto* loop_var = Result.Nodes.getNodeAs<DeclRefExpr>(MatcherForLoopVariableID);
+  const auto* comparism_operator = Result.Nodes.getNodeAs<BinaryOperator>("comparism_operator");
   if ( node ) {
       llvm::errs() << "found a node\n" ;
       if ( !Owner.isInRange( node, SM ) ) return;
-      SourceLocation StartLoc = node->getLocStart();
-      SourceLocation EndLoc = node->getLocEnd();
-      string replacement = string(" (") + getString( node, SM ) + string(" + ") + getString( literal , SM ) + string(") ");
-      ReplaceWith( Owner, SM, StartLoc, EndLoc, context, replacement );
+
+      // replace the literal with 0
+      {
+	  assert( literal && "somehow null" );	
+	  SourceLocation StartLoc = literal->getLocStart();
+	  SourceLocation EndLoc = literal->getLocEnd();
+	  string replacement = "0";
+	  ReplaceWith( Owner, SM, StartLoc, EndLoc, context, replacement );
+      }
+      // replace the comparism statement
+      {
+	  assert( comparism_operator && "somehow null" );
+	  auto pos = comparism_operator->getOperatorLoc();
+	  SourceLocation StartLoc = pos;
+	  SourceLocation EndLoc = pos;
+	  string replacement = "<";
+	  ReplaceWith( Owner, SM, StartLoc, EndLoc, context, replacement );
+      }
+      
+      // replace the index reference
+      {
+	  SourceLocation StartLoc = node->getLocStart();
+	  SourceLocation EndLoc = node->getLocEnd();
+	  string replacement = string("(") + getString( node, SM ) + string(" + ") + getString( literal , SM ) + string(")");
+	  ReplaceWith( Owner, SM, StartLoc, EndLoc, context, replacement );
+      }
   }
 
 }

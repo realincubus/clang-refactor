@@ -24,10 +24,15 @@ const char *MatcherUseStdArrayID = "matcherUseStdArrayID";
 
 DeclarationMatcher makeUseStdArrayMatcher(){
     return varDecl(
-	    hasType(
-		constantArrayType()
+	    anyOf(
+		hasType(
+		    constantArrayType()
+		)
+		,hasType( 
+		    incompleteArrayType()
+		)
 	    )
-	   ).bind(MatcherUseStdArrayID);
+    ).bind(MatcherUseStdArrayID);
 }
 
 

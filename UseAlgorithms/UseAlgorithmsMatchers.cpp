@@ -15,11 +15,13 @@
 
 #include "UseAlgorithmsMatchers.h"
 #include "clang/AST/ASTContext.h"
+#include "Core/MatcherUtils.hpp"
 
 using namespace clang::ast_matchers;
 using namespace clang;
 
 const char *MatcherUseAlgorithmsID = "matcherUseAlgorithmsID";
+
 
 // TODO add a way to look through compoundstatements with only one statement in it
 StatementMatcher makeLoopInitMatcher(){
@@ -47,56 +49,6 @@ StatementMatcher makeConditionMatcher() {
 	    );
 }
 
-StatementMatcher makeFillandIotaMatcher(){
-    return forStmt(
-	hasLoopInit(
-	   makeLoopInitMatcher() 
-	),
-	hasCondition(
-	    makeConditionMatcher()
-	),
-	hasBody(
-	    binaryOperator(
-		hasOperatorName("="),
-		hasRHS(
-		    anyOf(
-			ignoringParenImpCasts( // TODO check whether it is constexpr or const or if it is a reference to the loop var in this case it transforms to iota
-			    integerLiteral(
-
-			    ).bind("fill_int")
-			),
-			ignoringParenImpCasts(
-			    declRefExpr(
-				to(
-				    varDecl(
-				    ).bind("referenced_var")
-				)
-			    ).bind("iota_var")
-			)
-		    )
-		),
-		hasLHS(
-		    arraySubscriptExpr(
-#if 0
-			hasIndex(
-			    ignoringParenImpCasts(
-				declRefExpr(
-				    to(
-					varDecl(
-					    equalsBoundNode("iterator_var")
-					)
-				    )
-				)
-			    )
-			)
-#endif
-		    ).bind("array")
-		)
-	    )
-	)
-    ).bind(MatcherUseAlgorithmsID);
-}
-
 StatementMatcher makeIteratorReferenceMatcher() {
     return arraySubscriptExpr(
 		hasIndex(
@@ -105,28 +57,73 @@ StatementMatcher makeIteratorReferenceMatcher() {
 	    );
 }
 
-#if 1
-StatementMatcher makeCountMatcher() {
-    return forStmt(
-	hasLoopInit(
-	    makeLoopInitMatcher()
-	),
-	hasCondition(
-	    makeConditionMatcher()
-	),
-	hasBody(
-	    ifStmt(
+// TODO also match if there is a single statement in a compound expression
+StatementMatcher makeFillandIotaMatcher(){
+    return binaryOperator(
+		    hasOperatorName("="),
+		    hasRHS(
+			anyOf(
+			    ignoringParenImpCasts( // TODO check whether it is constexpr or const or if it is a reference to the loop var in this case it transforms to iota
+				integerLiteral(
+
+				).bind("fill_int")
+			    ),
+			    ignoringParenImpCasts(
+				declRefExpr(
+				    to(
+					varDecl(
+					).bind("referenced_var")
+				    )
+				).bind("iota_var")
+			    )
+			)
+		    ),
+		    hasLHS(
+			arraySubscriptExpr(
 #if 0
-		hasTrueExpression(
+			    hasIndex(
+				ignoringParenImpCasts(
+				    declRefExpr(
+					to(
+					    varDecl(
+						equalsBoundNode("iterator_var")
+					    )
+					)
+				    )
+				)
+			    )
+#endif
+			).bind("array")
+			)
+		    );
+
+}
+
+StatementMatcher makeCountMatcher(){
+    return ifStmt(
+#if 1
+#if 1
+		hasThen(
 		    unaryOperator(
-			hasOperatorName("++"),
-			declRefExpr()
+			hasOperatorName("++")
+#if 1
+#if 0
+			,
+			print()
+#endif
+			,
+			hasUnaryOperand(
+			    declRefExpr().bind("counter")
+			)
+#endif
 		    )
 		)
 		,
 #endif
+#if 1
 		hasCondition(
-		    anyOf(
+		    //anyOf(
+#if 0
 			binaryOperator(
 			    hasOperatorName("=="),
 			    hasRHS(
@@ -138,24 +135,47 @@ StatementMatcher makeCountMatcher() {
 				makeIteratorReferenceMatcher()
 			    )
 			),
+#endif
 			binaryOperator(
 			    hasOperatorName("=="),
-			    hasRHS(
-				makeIteratorReferenceMatcher()
-			    ),
 			    hasLHS(
+				ignoringParenImpCasts(
+				    arraySubscriptExpr(
+					
+				    ).bind("array")
+				)
+			    ),
+			    hasRHS(
 				ignoringParenImpCasts(
 				    integerLiteral().bind("count_this")
 				)
 			    )
 			)
-		    )
+		    //)
 		)
+#endif
+#endif
+	    );
+}
+
+StatementMatcher makeUseAlgorithmsMatcher(){
+    return forStmt(
+	hasLoopInit(
+	   makeLoopInitMatcher() 
+	),
+	hasCondition(
+	    makeConditionMatcher()
+	),
+	hasBody(
+	    anyOf(
+		makeCountMatcher(),
+		makeFillandIotaMatcher()
+		
 	    )
 	)
-    );
+    ).bind(MatcherUseAlgorithmsID);
 }
-#endif
+
 
 
 

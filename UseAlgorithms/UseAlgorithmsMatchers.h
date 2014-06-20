@@ -27,7 +27,6 @@ extern const char *MatcherCountMatcherID;
 /// to null within.
 /// Finding sequences of explict casts is necessary so that an entire sequence
 /// can be replaced instead of just the inner-most implicit cast.
-clang::ast_matchers::StatementMatcher makeFillandIotaMatcher();
-clang::ast_matchers::StatementMatcher makeCountMatcher();
+clang::ast_matchers::StatementMatcher makeUseAlgorithmsMatcher();
 
 #endif // CLANG_MODERNIZE_USE_NULLPTR_MATCHERS_H

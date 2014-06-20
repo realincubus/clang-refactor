@@ -24,13 +24,8 @@ const char *MatcherUseVectorID = "matcherUseVectorID";
 
 DeclarationMatcher makeUseVectorMatcher(){
     return varDecl(
-	anyOf(
-	    hasType( 
-		incompleteArrayType()
-	    ),
-	    hasType(	
-		variableArrayType()
-	    )
+	hasType(	
+	    variableArrayType()
 	)
     ).bind(MatcherUseVectorID);
 }

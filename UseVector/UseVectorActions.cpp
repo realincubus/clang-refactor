@@ -82,20 +82,6 @@ void UseVectorFixer::run(const ast_matchers::MatchFinder::MatchResult &Result) {
 	  ReplaceWith( Owner, SM, Range.getBegin(), Range.getEnd(), context, replacement );
       }
 
-      auto* incomplete_array_type = dyn_cast_or_null<const IncompleteArrayType>(qual_type.getTypePtr());
-      if ( incomplete_array_type ){
-	  cout << "is incomplete array type " << endl;
-	  auto element_qual_type = vla_type->getElementType();
-	  auto element_type_string = element_qual_type.getAsString();
-	  // TODO has to have a init list
-	  auto init_list = node->getInit();
-	  auto init_list_text = getString( init_list , SM );
-
-	  auto replacement = string("std::vector<") + element_type_string + string("> ") + name + string(" = ") + init_list_text;
-
-	  ReplaceWith( Owner, SM, Range.getBegin(), Range.getEnd(), context, replacement );
-
-      }
   }
 
 }

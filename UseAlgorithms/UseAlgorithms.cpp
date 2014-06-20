@@ -37,8 +37,7 @@ int UseAlgorithmsTransform::apply(const CompilationDatabase &Database,
   MatchFinder Finder;
   UseAlgorithmsFixer Fixer(AcceptedChanges, /*Owner=*/ *this);
 
-  Finder.addMatcher(makeFillandIotaMatcher(), &Fixer);
-  Finder.addMatcher(makeCountMatcher(), &Fixer);
+  Finder.addMatcher(makeUseAlgorithmsMatcher(), &Fixer);
 
   if (int result = UseAlgorithmsTool.run(createActionFactory(Finder))) {
     llvm::errs() << "Error encountered during translation.\n";
