@@ -8,24 +8,24 @@ using namespace clang;
 #include "clang/Lex/Lexer.h"
 
 namespace TransformationUtility {
-    static bool isReplaceableRange(SourceLocation StartLoc, SourceLocation EndLoc,
+    inline bool isReplaceableRange(SourceLocation StartLoc, SourceLocation EndLoc,
 			    const SourceManager &SM, const Transform &Owner) {
       return SM.isWrittenInSameFile(StartLoc, EndLoc) &&
 	     Owner.isFileModifiable(SM, StartLoc);
     }
 
-    static std::string getString( SourceRange sr, const SourceManager& SM ){
+    inline std::string getString( SourceRange sr, const SourceManager& SM ){
 	return Lexer::getSourceText( CharSourceRange::getTokenRange(sr), SM, LangOptions());
     }
 
     template< typename T >
-    static std::string getString( const T* node , const SourceManager& SM ){
+    inline std::string getString( const T* node , const SourceManager& SM ){
 	SourceLocation expr_start = node->getLocStart();
 	SourceLocation expr_end = node->getLocEnd();
 	return Lexer::getSourceText( CharSourceRange::getTokenRange(SourceRange(expr_start, expr_end)), SM, LangOptions());
     }
 
-    static bool areSameExpr(ASTContext *Context, const Expr *First,
+    inline bool areSameExpr(ASTContext *Context, const Expr *First,
 				    const Expr *Second) {
 	if (!First || !Second)
 	return false;
@@ -35,7 +35,7 @@ namespace TransformationUtility {
 	Second->Profile(SecondID, *Context, true);
 	return FirstID == SecondID;
     }
-    static void ReplaceWithSelf(Transform &Owner, SourceManager &SM, SourceLocation StartLoc, SourceLocation EndLoc, const clang::ASTContext& Context, const Expr* self ){ 
+    inline void ReplaceWithSelf(Transform &Owner, SourceManager &SM, SourceLocation StartLoc, SourceLocation EndLoc, const clang::ASTContext& Context, const Expr* self ){ 
       using namespace std;
 
       CharSourceRange Range(SourceRange(StartLoc, EndLoc), true);
@@ -48,7 +48,7 @@ namespace TransformationUtility {
       }
     }
 
-    static void ReplaceRangeWithRange(Transform &Owner, SourceManager &SM, const clang::ASTContext& Context, SourceRange replace_range, const SourceRange replacement_range ){ 
+    inline void ReplaceRangeWithRange(Transform &Owner, SourceManager &SM, const clang::ASTContext& Context, SourceRange replace_range, const SourceRange replacement_range ){ 
       using namespace std;
 
       CharSourceRange Range(replace_range, true);
