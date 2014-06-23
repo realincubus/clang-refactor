@@ -133,6 +133,44 @@ void UseAlgorithmsFixer::run(const ast_matchers::MatchFinder::MatchResult &Resul
       
       ReplaceWith( Owner, SM, StartLoc, EndLoc, context, replacement );
   }
+  // if the matcher found the specific copy nodes
+  auto copy_dest_node = Result.Nodes.getNodeAs<ArraySubscriptExpr>("copy_destination");
+  if (copy_dest_node){
+      llvm::errs() << "found a copy statement\n" ;
+
+      algorithm_used = "std::copy";
+      auto destination_name = getString( copy_dest_node->getBase(), SM );
+      last_arg_text = string("&") + destination_name + "[0]";
+      replacement = algorithm_used + replacement + last_arg_text + string(")");
+      
+      ReplaceWith( Owner, SM, StartLoc, EndLoc, context, replacement );
+  }
+
+  // put this together with the normal copy into a function
+  {
+      auto copy_dest_node = Result.Nodes.getNodeAs<DeclRefExpr>("copy_destination");
+      if ( copy_dest_node ){
+	  llvm::errs() << "found a copy push_back statement\n" ;
+
+	  algorithm_used = "std::copy";
+	  auto destination_name = getString( copy_dest_node, SM );
+	  last_arg_text = string("std::back_inserter( &") + destination_name + string("[0] )");
+	  replacement = algorithm_used + replacement + last_arg_text + string(")");
+	  
+	  ReplaceWith( Owner, SM, StartLoc, EndLoc, context, replacement );
+      }
+  }
+
+  auto accumulate_counter_node = Result.Nodes.getNodeAs<DeclRefExpr>("accumulate_counter");
+  if (accumulate_counter_node){
+      llvm::errs() << "found a accumulate statement\n" ;
+
+      algorithm_used = "std::accumulate";
+      auto init_name = getString( accumulate_counter_node, SM );
+      replacement = init_name + string(" = ") + algorithm_used + replacement + init_name + string(")");
+      
+      ReplaceWith( Owner, SM, StartLoc, EndLoc, context, replacement );
+  }
 
 }
 

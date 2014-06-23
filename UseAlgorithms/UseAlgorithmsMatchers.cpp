@@ -101,48 +101,37 @@ StatementMatcher makeFillandIotaMatcher(){
 
 StatementMatcher makeCountMatcher(){
     return ifStmt(
-#if 1
-#if 1
 		hasThen(
 		    unaryOperator(
-			hasOperatorName("++")
-#if 1
-#if 0
-			,
-			print()
-#endif
-			,
+			hasOperatorName("++"),
 			hasUnaryOperand(
 			    declRefExpr().bind("counter")
 			)
-#endif
 		    )
-		)
-		,
-#endif
-#if 1
+		),
+		// TODO make this look better 
+		// already implemented isCommutative but this does not work with 
+		// bind
 		hasCondition(
-		    //anyOf(
-#if 0
+		    anyOf(
 			binaryOperator(
 			    hasOperatorName("=="),
 			    hasRHS(
 				ignoringParenImpCasts(
-				    integerLiteral().bind("count_this")
+				    arraySubscriptExpr().bind("array")
 				)
 			    ),
 			    hasLHS(
-				makeIteratorReferenceMatcher()
+				ignoringParenImpCasts(
+				    integerLiteral().bind("count_this")
+				)
 			    )
 			),
-#endif
 			binaryOperator(
 			    hasOperatorName("=="),
 			    hasLHS(
 				ignoringParenImpCasts(
-				    arraySubscriptExpr(
-					
-				    ).bind("array")
+				    arraySubscriptExpr().bind("array")
 				)
 			    ),
 			    hasRHS(
@@ -151,12 +140,66 @@ StatementMatcher makeCountMatcher(){
 				)
 			    )
 			)
-		    //)
+		    )
 		)
-#endif
-#endif
 	    );
 }
+
+// TODO add checking for index
+StatementMatcher makeCopyMatcher() {
+    return binaryOperator(
+	hasOperatorName("="),
+	hasLHS(
+	    ignoringParenImpCasts(
+		arraySubscriptExpr().bind("copy_destination")
+	    )
+	),
+	hasRHS(
+	    ignoringParenImpCasts(
+		arraySubscriptExpr().bind("array")
+	    )
+	)
+    );
+}
+
+StatementMatcher makeAccumulateMatcher(){
+    return binaryOperator(
+	hasOperatorName("+="),
+	hasLHS(
+	    ignoringParenImpCasts(
+		declRefExpr().bind("accumulate_counter")
+	    )
+	),
+	hasRHS(
+	    ignoringParenImpCasts(
+		arraySubscriptExpr().bind("array")
+	    )
+	)
+    );
+}
+
+StatementMatcher makeCopyToIteratorMatcher(){
+    return memberCallExpr(
+	on(
+	    declRefExpr().bind("copy_destination")
+	),
+	argumentCountIs(1),
+	hasArgument(0, 
+	    ignoringParenImpCasts(
+		arraySubscriptExpr().bind("array")
+	    )
+	),
+	callee(
+	    methodDecl(
+		anyOf(
+		    hasName("push_back"),
+		    hasName("push_front")
+		)
+	    ).bind("insertion_type")
+	)
+    );
+}
+
 
 StatementMatcher makeUseAlgorithmsMatcher(){
     return forStmt(
@@ -169,8 +212,10 @@ StatementMatcher makeUseAlgorithmsMatcher(){
 	hasBody(
 	    anyOf(
 		makeCountMatcher(),
-		makeFillandIotaMatcher()
-		
+		makeFillandIotaMatcher(),
+		makeCopyMatcher(),
+		makeAccumulateMatcher(),
+		makeCopyToIteratorMatcher()
 	    )
 	)
     ).bind(MatcherUseAlgorithmsID);
