@@ -23,9 +23,23 @@ using namespace clang;
 const char *MatcherUseAlgorithmsID = "matcherUseAlgorithmsID";
 
 
+StatementMatcher inSingleLineCompoundStmt( StatementMatcher innerMatcher ){
+    return anyOf(
+	    compoundStmt(
+		statementCountIs(1),
+		hasAnySubstatement(
+		    innerMatcher
+		)
+	    ).bind("is_in_compound"),
+		innerMatcher
+	    );
+
+}
+
 // TODO add a way to look through compoundstatements with only one statement in it
 StatementMatcher makeLoopInitMatcher(){
-    return declStmt(
+    return inSingleLineCompoundStmt(
+	    declStmt(
 		hasSingleDecl(
 		    varDecl(
 			hasInitializer(
@@ -35,31 +49,37 @@ StatementMatcher makeLoopInitMatcher(){
 			)
 		    ).bind("iterator_var")
 		)
-	    );
+	    )
+    );
 }
 
 StatementMatcher makeConditionMatcher() {
-    return binaryOperator(
+    return inSingleLineCompoundStmt(
+	    binaryOperator(
 		hasOperatorName("<"),
 		hasRHS(
 		    ignoringParenImpCasts(
 			integerLiteral().bind("end_int")
 		    )
 		)
-	    );
+	    )
+    );
 }
 
 StatementMatcher makeIteratorReferenceMatcher() {
-    return arraySubscriptExpr(
+    return inSingleLineCompoundStmt(
+	    arraySubscriptExpr(
 		hasIndex(
 		    declRefExpr().bind("iterator_ref")
 		)
-	    );
+	    )
+    );
 }
 
 // TODO also match if there is a single statement in a compound expression
 StatementMatcher makeFillandIotaMatcher(){
-    return binaryOperator(
+    return inSingleLineCompoundStmt(
+	    binaryOperator(
 		    hasOperatorName("="),
 		    hasRHS(
 			anyOf(
@@ -95,12 +115,14 @@ StatementMatcher makeFillandIotaMatcher(){
 #endif
 			).bind("array")
 			)
-		    );
+		    )
+    );
 
 }
 
 StatementMatcher makeCountMatcher(){
-    return ifStmt(
+    return inSingleLineCompoundStmt(
+	    ifStmt(
 		hasThen(
 		    unaryOperator(
 			hasOperatorName("++"),
@@ -142,39 +164,44 @@ StatementMatcher makeCountMatcher(){
 			)
 		    )
 		)
-	    );
+	    )
+    );
 }
 
 // TODO add checking for index
 StatementMatcher makeCopyMatcher() {
-    return binaryOperator(
-	hasOperatorName("="),
-	hasLHS(
-	    ignoringParenImpCasts(
-		arraySubscriptExpr().bind("copy_destination")
+    return inSingleLineCompoundStmt(
+	    binaryOperator(
+		hasOperatorName("="),
+		hasLHS(
+		    ignoringParenImpCasts(
+			arraySubscriptExpr().bind("copy_destination")
+		    )
+		),
+		hasRHS(
+		    ignoringParenImpCasts(
+			arraySubscriptExpr().bind("array")
+		    )
+		)
 	    )
-	),
-	hasRHS(
-	    ignoringParenImpCasts(
-		arraySubscriptExpr().bind("array")
-	    )
-	)
     );
 }
 
+
 StatementMatcher makeAccumulateMatcher(){
-    return binaryOperator(
-	hasOperatorName("+="),
-	hasLHS(
-	    ignoringParenImpCasts(
-		declRefExpr().bind("accumulate_counter")
+    return inSingleLineCompoundStmt( binaryOperator(
+	    hasOperatorName("+="),
+	    hasLHS(
+		ignoringParenImpCasts(
+		    declRefExpr().bind("accumulate_counter")
+		)
+	    ),
+	    hasRHS(
+		ignoringParenImpCasts(
+		    arraySubscriptExpr().bind("array")
+		)
 	    )
-	),
-	hasRHS(
-	    ignoringParenImpCasts(
-		arraySubscriptExpr().bind("array")
-	    )
-	)
+	) 
     );
 }
 
@@ -199,7 +226,17 @@ StatementMatcher makeCopyToIteratorMatcher(){
 	)
     );
 }
+#if 0
+StatementMatcher makeAllOfMatcher(){
+    return if ( 
+}
+#endif
 
+#if 0
+StatementMatcher ignoreOneLineCompoundStatement( StatementMatcher Submatcher ){
+    return statementCountIs(1)
+}
+#endif
 
 StatementMatcher makeUseAlgorithmsMatcher(){
     return forStmt(

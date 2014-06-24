@@ -152,9 +152,20 @@ void UseAlgorithmsFixer::run(const ast_matchers::MatchFinder::MatchResult &Resul
       if ( copy_dest_node ){
 	  llvm::errs() << "found a copy push_back statement\n" ;
 
+	  auto insertion_type_node = Result.Nodes.getNodeAs<CXXMethodDecl>("insertion_type");
+	  auto insertion_type = insertion_type_node->getNameAsString();
+
+	  std::string inserter_iterator = "";
+	  if ( insertion_type.compare("push_back") == 0 ) {
+	      inserter_iterator = "std::back_inserter";
+	  }
+	  if ( insertion_type.compare("push_front") == 0 ) {
+	      inserter_iterator = "std::front_inserter";
+	  }
+
 	  algorithm_used = "std::copy";
 	  auto destination_name = getString( copy_dest_node, SM );
-	  last_arg_text = string("std::back_inserter( &") + destination_name + string("[0] )");
+	  last_arg_text = inserter_iterator + string("( &") + destination_name + string("[0] )");
 	  replacement = algorithm_used + replacement + last_arg_text + string(")");
 	  
 	  ReplaceWith( Owner, SM, StartLoc, EndLoc, context, replacement );
@@ -164,10 +175,15 @@ void UseAlgorithmsFixer::run(const ast_matchers::MatchFinder::MatchResult &Resul
   auto accumulate_counter_node = Result.Nodes.getNodeAs<DeclRefExpr>("accumulate_counter");
   if (accumulate_counter_node){
       llvm::errs() << "found a accumulate statement\n" ;
+      auto is_in_compound_node = Result.Nodes.getNodeAs<CompoundStmt>("is_in_compound");
+      string end_with_semicolon = "";
+      if ( is_in_compound_node ) {
+	end_with_semicolon = ";";
+      }
 
       algorithm_used = "std::accumulate";
       auto init_name = getString( accumulate_counter_node, SM );
-      replacement = init_name + string(" = ") + algorithm_used + replacement + init_name + string(")");
+      replacement = init_name + string(" = ") + algorithm_used + replacement + init_name + string(")") + end_with_semicolon;
       
       ReplaceWith( Owner, SM, StartLoc, EndLoc, context, replacement );
   }
