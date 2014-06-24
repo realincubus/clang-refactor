@@ -208,7 +208,7 @@ StatementMatcher makeAccumulateMatcher(){
 StatementMatcher makeCopyToIteratorMatcher(){
     return memberCallExpr(
 	on(
-	    declRefExpr().bind("copy_destination")
+	    declRefExpr().bind("copy_iterator_destination")
 	),
 	argumentCountIs(1),
 	hasArgument(0, 
@@ -226,36 +226,28 @@ StatementMatcher makeCopyToIteratorMatcher(){
 	)
     );
 }
-#if 0
-StatementMatcher makeAllOfMatcher(){
-    return if ( 
-}
-#endif
 
-#if 0
-StatementMatcher ignoreOneLineCompoundStatement( StatementMatcher Submatcher ){
-    return statementCountIs(1)
-}
-#endif
 
 StatementMatcher makeUseAlgorithmsMatcher(){
-    return forStmt(
-	hasLoopInit(
-	   makeLoopInitMatcher() 
-	),
-	hasCondition(
-	    makeConditionMatcher()
-	),
-	hasBody(
-	    anyOf(
-		makeCountMatcher(),
-		makeFillandIotaMatcher(),
-		makeCopyMatcher(),
-		makeAccumulateMatcher(),
-		makeCopyToIteratorMatcher()
-	    )
-	)
-    ).bind(MatcherUseAlgorithmsID);
+    return 
+		forStmt(
+		    hasLoopInit(
+		       makeLoopInitMatcher() 
+		    ),
+		    hasCondition(
+			makeConditionMatcher()
+		    ),
+		    hasBody(
+			anyOf(
+			    makeCountMatcher(),
+			    makeFillandIotaMatcher(),
+			    makeCopyMatcher(),
+			    makeAccumulateMatcher(),
+			    makeCopyToIteratorMatcher()
+			)
+		    )
+		).bind(MatcherUseAlgorithmsID)
+    ;
 }
 
 

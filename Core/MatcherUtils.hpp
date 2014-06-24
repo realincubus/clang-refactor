@@ -24,36 +24,88 @@ AST_MATCHER_P2(BinaryOperator, isCommutative , internal::Matcher<Expr>, Internal
     return false;
 }
 
-AST_MATCHER(Stmt, print) {
-    llvm::errs() << "StatementClassName " << Node.getStmtClassName() << "\n";
+AST_MATCHER_P(Stmt, print, std::string, pos ) {
+    llvm::errs() << "StatementClassName " << Node.getStmtClassName() << " invoked at " << pos << "\n";
     Node.dumpColor();
     return true;
 }
 
-#if 1
-AST_MATCHER_P(Stmt, ignoringOneLineCompoundStatement , internal::Matcher<Stmt>, Internal1 ) {
-
-    auto compound_statement = dyn_cast_or_null<CompoundStmt>(&Node);
-    if ( compound_statement ){
-	// if the node we look at is a compound statment check wheather it 
-	// stores 1 sub statement
-	if ( compound_statement->size() != 1 ) return false;
-
-	// if there is just one statement run the interal matcher on it
-	if ( Internal1.matches( *(*compound_statement->body_begin()), Finder, Builder) ) {
-	    return true;
+AST_MATCHER_P2(CompoundStmt, predecessor, const Stmt*, stmt, internal::Matcher<Stmt>, Internal ) {
+    
+    for( auto I = Node.body_begin(), E = Node.body_end(); I != E ; I++ ){
+	if ( *I == stmt ){
+	    decltype(I) previous = I - 1;
+	    // if the statement is the first in the list
+	    if ( previous == I ) return false;
+	    if ( Internal.matches( *(*previous), Finder, Builder ) ) {
+		return true;
+	    }
+	    return false;
 	}
-    }else{
-	// if the statement is not a compound statement 
-	// run the internal matcher on the node itself
-	if ( Internal1.matches( Node, Finder, Builder ) ){
-	    return true;
+    }
+    return false;
+}
+
+AST_MATCHER_P2(CompoundStmt, successor, const Stmt*, stmt, internal::Matcher<Stmt>, Internal ) {
+    
+    for( auto I = Node.body_begin(), E = Node.body_end(); I != E ; I++ ){
+	if ( *I == stmt ){
+	    decltype(I) next = I + 1;
+	    // if the statement is the last in the list
+	    if ( next == Node.body_end() ) return false;
+	    if ( Internal.matches( *(*next), Finder, Builder ) ) {
+		return true;
+	    }
+	    return false;
 	}
+    }
+    return false;
+}
+
+AST_MATCHER_P(Stmt, predecessorStmt, internal::Matcher<Stmt>, Internal ) {
+
+    StatementMatcher ParentMatcher = 
+	    compoundStmt(
+		predecessor( 
+		    &Node,
+		    Internal
+		)
+	    );
+    if ( Finder->matchesAncestorOf( Node, ParentMatcher, Builder, ASTMatchFinder::AMM_ParentOnly) ) {
+	return true;	
+    }
+    return false;
+}
+
+AST_MATCHER_P(Stmt, succecessorStmt, internal::Matcher<Stmt>, Internal ) {
+
+    StatementMatcher ParentMatcher = 
+	    compoundStmt(
+		successor( 
+		    &Node,
+		    Internal
+		)
+	    );
+    if ( Finder->matchesAncestorOf( Node, ParentMatcher, Builder, ASTMatchFinder::AMM_ParentOnly) ) {
+	return true;	
+    }
+    return false;
+}
+
+AST_MATCHER_P2(CompoundStmt, getSubStatement, int, id, internal::Matcher<Stmt>, Internal ) {
+
+    int ctr = 0;
+    for( auto I = Node.body_begin(), E = Node.body_end(); I != E ; I++ ){
+	if ( ctr == id ) {
+	    if ( Internal.matches( *(*I), Finder, Builder ) ) return true;
+	    return false;
+	}
+	ctr++;
     }
 
     return false;
 }
-#endif
+
 
 } // ast_matchers
 } // clang
