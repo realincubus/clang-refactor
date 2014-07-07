@@ -25,7 +25,6 @@ const char *MatcherUseSwapID = "matcherUseSwapID";
 StatementMatcher makeSwapMatcher(){
     return stmt(
 	binaryOperator(
-	    print("mid expression"),
 	    hasOperatorName("="),
 	    hasLHS(
 		ignoringParenImpCasts(
@@ -40,7 +39,6 @@ StatementMatcher makeSwapMatcher(){
 	),
 	predecessorStmt(
 	    binaryOperator(
-		print("predecessorStmt"),
 		hasOperatorName("="),
 		hasLHS(
 		    ignoringParenImpCasts(
@@ -56,7 +54,6 @@ StatementMatcher makeSwapMatcher(){
 	),
 	succecessorStmt(
 	    binaryOperator(
-		print("succecessorStmt"),
 		hasOperatorName("="),
 		hasLHS(
 		    ignoringParenImpCasts(
