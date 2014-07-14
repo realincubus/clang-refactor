@@ -119,6 +119,9 @@ list(APPEND ClangModernizeSources ${NestedIndexRenamerSources})
 file(GLOB_RECURSE UseSwapSources "../UseSwap/*.cpp")
 list(APPEND ClangModernizeSources ${UseSwapSources})
 
+file(GLOB_RECURSE FuseToSimdVectorSources "../FuseToSimdVector/*.cpp")
+list(APPEND ClangModernizeSources ${FuseToSimdVectorSources})
+
 
 add_clang_executable(clang-refactor
   ${ClangModernizeSources}

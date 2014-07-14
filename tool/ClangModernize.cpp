@@ -88,10 +88,14 @@ LineRanges("lines", cl::desc("<start line>:<end line> - format a range of\n"
                              "lines (both 1-based).\n"
                              "Multiple ranges can be formatted by specifying\n"
                              "several -lines arguments.\n"
-                             "Can't be used with -offset and -length.\n"
-                             "Can only be used with one input file."),
-			       cl::cat(GeneralCategory));
+                             "Can only be used with one input file."
+			     ),cl::cat(GeneralCategory));
 
+static cl::opt<std::string> NewName(
+			    "new_name", 
+			    cl::desc("The new name that will be used for some transformations"), 
+			    cl::Optional, cl::Hidden, 
+			    cl::cat(GeneralCategory));
 
 static cl::opt<RiskLevel, /*ExternalStorage=*/true> MaxRiskLevel(
     "risk", cl::desc("Select a maximum risk level:"),
@@ -373,6 +377,8 @@ int main(int argc, const char **argv) {
     Sources.erase(E, Sources.end());
   }
 
+
+
   // check if line ranges are just applyed to single files
   if ( !LineRanges.empty() && Sources.size() > 1 ){
      llvm::errs() << "error: -line can only be used for single file.\n";
@@ -454,6 +460,11 @@ int main(int argc, const char **argv) {
                                   E = TransformManager.end();
        I != E; ++I) {
     Transform *T = *I;
+
+    // patch in the transformation details
+    if ( NewName.getNumOccurrences() > 0) {
+	T->new_name = NewName;
+    }
 
     if (T->apply(*Compilations, Sources,LineRanges) != 0) {
       // FIXME: Improve ClangTool to not abort if just one file fails.

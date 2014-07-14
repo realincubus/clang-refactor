@@ -112,6 +112,9 @@ public:
       unsigned int column_end = -1;
   };
 
+
+  // added parts TODO let these things me inherited 
+  std::string new_name = "default_name";
   std::list<RangeDiscriptor> line_ranges;
 
   void parsePositionArguments( const llvm::cl::list<std::string> LineRanges ){
