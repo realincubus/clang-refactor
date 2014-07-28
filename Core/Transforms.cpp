@@ -14,6 +14,8 @@
 
 #include "Core/Transforms.h"
 #include "Core/Transform.h"
+#include <iostream>
+using namespace std;
 
 namespace cl = llvm::cl;
 
@@ -32,9 +34,11 @@ Transforms::~Transforms() {
 void Transforms::registerTransforms() {
   for (TransformFactoryRegistry::iterator I = TransformFactoryRegistry::begin(),
                                           E = TransformFactoryRegistry::end();
-       I != E; ++I)
+       I != E; ++I){
+      cout << "name of transform " << I->getName() << endl;
     Options[I->getName()] = new cl::opt<bool>(
         I->getName(), cl::desc(I->getDesc()), cl::cat(TransformCategory));
+  }
 }
 
 bool Transforms::hasAnyExplicitOption() const {
@@ -61,7 +65,7 @@ Transforms::createSelectedTransforms(const TransformOptions &GlobalOptions,
     if (!OptionEnabled)
       continue;
 
-    llvm::OwningPtr<TransformFactory> Factory(I->instantiate());
+    std::unique_ptr<TransformFactory> Factory(I->instantiate());
     if (Factory->supportsCompilers(RequiredVersions))
       ChosenTransforms.push_back(Factory->createTransform(GlobalOptions));
     else if (ExplicitlyEnabled)

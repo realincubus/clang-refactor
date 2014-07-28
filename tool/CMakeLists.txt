@@ -122,6 +122,8 @@ list(APPEND ClangModernizeSources ${UseSwapSources})
 file(GLOB_RECURSE FuseToSimdVectorSources "../FuseToSimdVector/*.cpp")
 list(APPEND ClangModernizeSources ${FuseToSimdVectorSources})
 
+file(GLOB_RECURSE UseFullyQualifiedTypesSources "../UseFullyQualifiedTypes/*.cpp")
+list(APPEND ClangModernizeSources ${UseFullyQualifiedTypesSources})
 
 add_clang_executable(clang-refactor
   ${ClangModernizeSources}

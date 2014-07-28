@@ -10,8 +10,17 @@ namespace TransformationUtility {
 inline bool isReplaceableRange(SourceLocation StartLoc, SourceLocation EndLoc,
                                const SourceManager &SM,
                                const Transform &Owner) {
-  return SM.isWrittenInSameFile(StartLoc, EndLoc) &&
-         Owner.isFileModifiable(SM, StartLoc);
+  llvm::errs() << "checking written in same file\n";
+  if ( !SM.isWrittenInSameFile(StartLoc, EndLoc) ) {
+      llvm::errs() << "is not written in the same file\n";
+      return false;
+  }
+  llvm::errs() << "checking modifiability\n";
+  if ( !Owner.isFileModifiable(SM, StartLoc) ) {
+      llvm::errs() << "is not modifiable\n";
+      return false;
+  }
+  return true;
 }
 
 inline std::string getString(const SourceRange sr, const SourceManager &SM) {

@@ -33,19 +33,6 @@ using namespace clang;
 
 using namespace TransformationUtility;
 
-namespace {
-    void ReplaceWith(Transform &Owner, SourceManager &SM,
-			    SourceLocation StartLoc, SourceLocation EndLoc, const clang::ASTContext& Context, std::string replacement ){ 
-	using namespace std;
-
-      CharSourceRange Range(SourceRange(StartLoc, EndLoc), true);
-
-      if ( isReplaceableRange( StartLoc, EndLoc, SM, Owner ) ){ 
-	  Owner.addReplacementForCurrentTU( tooling::Replacement(SM, Range, replacement ));
-      }
-    }
-}
-
 RenameVariableFixer::RenameVariableFixer(unsigned &AcceptedChanges,
                            Transform &Owner)
     : AcceptedChanges(AcceptedChanges), Owner(Owner) {
@@ -66,16 +53,15 @@ void RenameVariableFixer::run(const ast_matchers::MatchFinder::MatchResult &Resu
 	  SourceLocation StartLoc = node->getLocStart();
 	  SourceLocation EndLoc = node->getLocEnd();
 
-	  ReplaceWith( Owner, SM, StartLoc, EndLoc, context, "new_name" );
+	  ReplaceWithString( Owner, SM, StartLoc, EndLoc, context, "new_name" );
       }
   }
 
   {
-    const VarDecl* node = Result.Nodes.getNodeAs<VarDecl>(MatcherRenameVariableDeclID);
+    const auto* node = Result.Nodes.getNodeAs<VarDecl>(MatcherRenameVariableDeclID);
     if ( node ) {
 	if ( Owner.isInRange( node , SM ) ){
 #if 1
-	    auto decl_name = node->getDeclName();
 	    string decl_init_text = "";
 	    if ( node->hasInit() ){ 
 		auto decl_init = node->getInit();
@@ -88,7 +74,7 @@ void RenameVariableFixer::run(const ast_matchers::MatchFinder::MatchResult &Resu
 	    cout << "found decl" << endl;
 	    //SourceLocation StartLoc = node->getLocStart();
 	    //SourceLocation EndLoc = node->getLocEnd();
-	    ReplaceWith( Owner, SM, Range.getBegin(), Range.getEnd(), context, decl_type );
+	    ReplaceWithString( Owner, SM, Range.getBegin(), Range.getEnd(), context, decl_type );
 	}
     }
   }

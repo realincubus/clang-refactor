@@ -24,12 +24,12 @@ const char *MatcherRenameVariableDeclID = "matcherRenameVariableDeclID";
 
 
 StatementMatcher makeRenameVariableMatcher(){
-    return declRefExpr().bind(MatcherRenameVariableID);
+    return declRefExpr(to(varDecl(hasLocalStorage()))).bind(MatcherRenameVariableID);
 }
 
 #if 1
 DeclarationMatcher makeRenameVariableMatcherDecl(){
-    return namedDecl().bind(MatcherRenameVariableDeclID);
+    return varDecl(hasLocalStorage()).bind(MatcherRenameVariableDeclID);
 }
 #endif
 

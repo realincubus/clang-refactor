@@ -21,6 +21,8 @@
 #include "clang/Tooling/Tooling.h"
 #include "llvm/ADT/STLExtras.h"
 
+template class llvm::Registry<TransformFactory>;
+
 using namespace clang;
 
 llvm::cl::OptionCategory TransformsOptionsCategory("Transforms' options");
@@ -80,8 +82,6 @@ Transform::Transform(llvm::StringRef Name, const TransformOptions &Options)
 }
 
 Transform::~Transform() {}
-
-
 
 bool Transform::isFileModifiable(const SourceManager &SM,
                                  const SourceLocation &Loc) const {
