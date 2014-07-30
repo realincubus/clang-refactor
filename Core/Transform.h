@@ -112,6 +112,68 @@ public:
       unsigned int column_end = -1;
   };
 
+  struct TargetDescriptor {
+      std::string filename;
+      bool isSet = false;
+      int line_begin = -1;
+      int column_begin = -1;
+      int line_end = -1;
+      int column_end = -1;
+      TargetDescriptor(){
+      }
+      TargetDescriptor(std::string _filename, int _line_begin, int _column_begin,
+		    int _line_end, int _column_end ){
+
+	  filename     = _filename;
+	  line_begin   = _line_begin;
+	  column_begin = _column_begin;
+	  line_end     = _line_end;
+	  column_end   = _column_end;
+      }
+  } target;
+
+  void setTarget( std::string filename, int line_begin, int column_begin,
+		    int line_end, int column_end ){
+     target = TargetDescriptor( filename, line_begin, column_begin, line_end,
+	     column_end );
+  }
+
+  template <typename T>
+  bool isTarget( T* obj, clang::SourceManager& SM ){
+    auto start_loc = obj->getLocStart();
+    auto end_loc = obj->getLocEnd();
+    clang::FullSourceLoc full_start_loc( start_loc, SM );
+    clang::FullSourceLoc full_end_loc( end_loc, SM );
+    auto file_loc = SM.getFileLoc( start_loc );
+    auto file_end_loc = SM.getFileLoc( end_loc );
+    auto expr_line_begin = SM.getSpellingLineNumber(file_loc);
+    auto expr_column_begin = SM.getSpellingColumnNumber(file_loc);
+    auto expr_line_end = SM.getSpellingLineNumber(file_end_loc);
+    auto expr_column_end = SM.getSpellingColumnNumber(file_end_loc);
+    auto filename = SM.getFilename( file_loc );
+    llvm::errs() << "filename: " << filename << 
+	expr_line_begin << ":" << expr_column_begin << " - " <<
+	expr_line_end << ":" << expr_column_end << "\n";
+    llvm::errs() << "target.filename: " << target.filename << "\n";
+    // check the filename
+    if ( filename != target.filename ) {
+	llvm::errs() << "filename is wrong\n";
+	return false;
+    }
+    // check the range
+    if ( expr_line_begin >= target.line_begin && 
+	    expr_line_end <= target.line_end ){
+		if ( expr_line_begin == target.line_end ){
+		    if ( ! ( expr_column_begin >= target.column_begin && 
+			expr_column_end <= target.column_end ) ){
+			return false;
+		}
+	}
+	return true;
+    }
+    return false;
+  }
+
 
   // added parts TODO let these things me inherited 
   std::string new_name = "default_name";

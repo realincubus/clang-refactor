@@ -38,7 +38,7 @@ int RenameVariableTransform::apply(const CompilationDatabase &Database,
   RenameVariableFixer Fixer(AcceptedChanges, /*Owner=*/ *this);
 
   Finder.addMatcher(makeRenameVariableMatcher(), &Fixer);
-  Finder.addMatcher(makeRenameVariableMatcherDecl(), &Fixer);
+  //Finder.addMatcher(makeRenameVariableMatcherDecl(), &Fixer);
 
   if (int result = RenameVariableTool.run(createActionFactory(Finder))) {
     llvm::errs() << "Error encountered during translation.\n";

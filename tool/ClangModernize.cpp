@@ -91,6 +91,10 @@ LineRanges("lines", cl::desc("<start line>:<end line> - format a range of\n"
                              "Can only be used with one input file."
 			     ),cl::cat(GeneralCategory));
 
+static cl::opt<std::string>
+Target("target", cl::desc("<file-name>:<start line>:<end line> - the target of a transformation\n"
+			     ),cl::cat(GeneralCategory));
+
 static cl::opt<std::string> NewName(
 			    "new_name", 
 			    cl::desc("The new name that will be used for some transformations"), 
@@ -389,6 +393,27 @@ int main(int argc, const char **argv) {
   if ( !LineRanges.empty() ){
   }
 
+  
+  std::string filename;
+  int line_begin, column_begin;
+  int line_end, column_end;
+
+  if ( Target.getNumOccurrences() ) {
+    // TODO parse the target data 
+    std::stringstream sstr(Target);
+    char separator;
+    sstr >> 
+	line_begin >> separator >> 
+	column_begin >> separator >> 
+	line_end >> separator >> 
+	column_end >> separator >> filename;
+
+    llvm::errs() << filename << " " << line_begin << "-" << 
+	column_begin << ":" << line_end << "-" << column_end << "\n";
+
+    // store it in the Transform object
+  }
+
   if (Sources.empty()) {
     llvm::errs() << llvm::sys::path::filename(argv[0])
                  << ": Could not determine sources to transform.\n";
@@ -462,8 +487,11 @@ int main(int argc, const char **argv) {
     Transform *T = *I;
 
     // patch in the transformation details
-    if ( NewName.getNumOccurrences() > 0) {
+    if ( NewName.getNumOccurrences() ) {
 	T->new_name = NewName;
+    }
+    if ( Target.getNumOccurrences() ) {
+	T->setTarget( filename, line_begin, column_begin, line_end, column_end );
     }
 
     if (T->apply(*Compilations, Sources,LineRanges) != 0) {

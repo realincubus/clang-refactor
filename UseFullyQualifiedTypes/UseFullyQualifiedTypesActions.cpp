@@ -67,15 +67,12 @@ void UseFullyQualifiedTypesFixer::run(const ast_matchers::MatchFinder::MatchResu
   const auto* type_loc = Result.Nodes.getNodeAs<TypeLoc>("type_loc");
   if ( type_loc ) {
       if ( !Owner.isInRange( type_loc, SM ) ) return;
-      llvm::errs() << "is in range\n" ;
 #if 0
       auto sloc = SM.getSpellingLoc( type_loc->getLocStart() ) ;
       if (!Owner.isFileModifiable(SM, sloc))
 	  return;
 #endif
 
-      llvm::errs() << "got loc start\n" ;
-      type_loc->getLocStart().dump(SM) ;
       //sloc.dump(SM);
       if (!Owner.isFileModifiable(SM, type_loc->getLocStart())) return;
       
