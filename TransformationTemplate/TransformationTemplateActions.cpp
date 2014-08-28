@@ -33,27 +33,6 @@ using namespace clang;
 
 using namespace TransformationUtility;
 
-namespace {
-void ReplaceWith(Transform &Owner, SourceManager &SM,
-                        SourceLocation StartLoc, SourceLocation EndLoc, const clang::ASTContext& Context, const Expr* argument ){ 
-    using namespace std;
-
-  CharSourceRange Range(SourceRange(StartLoc, EndLoc), true);
-
-  string source_text = getString( argument, SM );
-  string replacement = source_text; 
-
-  if ( isReplaceableRange( StartLoc, EndLoc, SM, Owner ) ){ 
-      Owner.addReplacementForCurrentTU( tooling::Replacement(SM, Range, replacement ));
-  }
-}
-}
-
-TransformationTemplateFixer::TransformationTemplateFixer(unsigned &AcceptedChanges,
-                           Transform &Owner)
-    : AcceptedChanges(AcceptedChanges), Owner(Owner) {
-}
-
 
 void TransformationTemplateFixer::run(const ast_matchers::MatchFinder::MatchResult &Result) {
   using namespace std;
@@ -65,7 +44,7 @@ void TransformationTemplateFixer::run(const ast_matchers::MatchFinder::MatchResu
       if ( !Owner.isInRange( node, SM ) ) return;
       SourceLocation StartLoc = node->getLocStart();
       SourceLocation EndLoc = node->getLocEnd();
-      ReplaceWith( Owner, SM, StartLoc, EndLoc, context, node );
+      ReplaceWithString( Owner, SM, StartLoc, EndLoc, context, "replacement" );
   }
 
 }

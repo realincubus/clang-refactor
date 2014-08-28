@@ -430,6 +430,7 @@ int main(int argc, const char **argv) {
     return 1;
 
   TransformManager.createSelectedTransforms(GlobalOptions, RequiredVersions);
+  TransformManager.orderByPrioity();
 
   if (TransformManager.begin() == TransformManager.end()) {
     if (SupportedCompilers.empty())
@@ -481,6 +482,9 @@ int main(int argc, const char **argv) {
 
   SourcePerfData PerfData;
 
+  bool isFoundMangledName = false;
+  std::string foundMangledName = "";
+
   for (Transforms::const_iterator I = TransformManager.begin(),
                                   E = TransformManager.end();
        I != E; ++I) {
@@ -490,6 +494,11 @@ int main(int argc, const char **argv) {
     if ( NewName.getNumOccurrences() ) {
 	T->new_name = NewName;
     }
+
+    if ( isFoundMangledName ) {
+	T->setFoundMangledName( foundMangledName );
+    }
+
     if ( Target.getNumOccurrences() ) {
 	T->setTarget( filename, line_begin, column_begin, line_end, column_end );
     }
@@ -497,6 +506,12 @@ int main(int argc, const char **argv) {
     if (T->apply(*Compilations, Sources,LineRanges) != 0) {
       // FIXME: Improve ClangTool to not abort if just one file fails.
       return 1;
+    }
+
+    // TODO if the query transformation was run store the result so one can use it later
+    if ( T->isFoundMangledName ) {
+	foundMangledName = T->foundMangledName;
+	isFoundMangledName = true;
     }
 
     if (GlobalOptions.EnableTiming)

@@ -1,4 +1,4 @@
-//===-- TransformationTemplate/TransformationTemplate.cpp ----------------===//
+//===-- QueryMangledName/QueryMangledName.cpp ----------------===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -8,14 +8,14 @@
 //===----------------------------------------------------------------------===//
 ///
 /// \file
-/// \brief This file provides the implementation of the TransformationTemplateTransform
+/// \brief This file provides the implementation of the QueryMangledNameTransform
 /// class.
 ///
 //===----------------------------------------------------------------------===//
 
-#include "TransformationTemplate.h"
-#include "TransformationTemplateActions.h"
-#include "TransformationTemplateMatchers.h"
+#include "QueryMangledName.h"
+#include "QueryMangledNameActions.h"
+#include "QueryMangledNameMatchers.h"
 #include "clang/Frontend/FrontendActions.h"
 #include "clang/Tooling/Refactoring.h"
 #include "clang/Tooling/Tooling.h"
@@ -25,21 +25,22 @@ using namespace clang::tooling;
 using namespace clang;
 namespace cl = llvm::cl;
 
-int TransformationTemplateTransform::apply(const CompilationDatabase &Database,
+int QueryMangledNameTransform::apply(const CompilationDatabase &Database,
                                const std::vector<std::string> &SourcePaths,
 			       const llvm::cl::list<std::string>& LineRanges 
 			       ) {
   parsePositionArguments( LineRanges ); 
-  ClangTool TransformationTemplateTool(Database, SourcePaths);
+  ClangTool QueryMangledNameTool(Database, SourcePaths);
 
   unsigned AcceptedChanges = 0;
 
   MatchFinder Finder;
-  TransformationTemplateFixer Fixer(AcceptedChanges, /*Owner=*/ *this);
+  QueryMangledNameFixer Fixer(AcceptedChanges, /*Owner=*/ *this);
 
-  Finder.addMatcher(makeTransformationTemplateMatcher(), &Fixer);
+  Finder.addMatcher(makeQueryMangledNameMatcher(), &Fixer);
+  Finder.addMatcher(makeQueryMangledNameMatcherRef(), &Fixer);
 
-  if (int result = TransformationTemplateTool.run(createActionFactory(Finder))) {
+  if (int result = QueryMangledNameTool.run(createActionFactory(Finder))) {
     llvm::errs() << "Error encountered during translation.\n";
     return result;
   }
@@ -49,8 +50,8 @@ int TransformationTemplateTransform::apply(const CompilationDatabase &Database,
   return 0;
 }
 
-struct TransformationTemplateFactory : TransformFactory {
-  TransformationTemplateFactory() {
+struct QueryMangledNameFactory : TransformFactory {
+  QueryMangledNameFactory() {
     Since.Clang = Version(3, 0);
     Since.Gcc = Version(4, 6);
     Since.Icc = Version(12, 1);
@@ -58,14 +59,14 @@ struct TransformationTemplateFactory : TransformFactory {
   }
 
   Transform *createTransform(const TransformOptions &Opts) override {
-    return new TransformationTemplateTransform(Opts);
+    return new QueryMangledNameTransform(Opts);
   }
 };
 
 // Register the factory using this statically initialized variable.
-static TransformFactoryRegistry::Add<TransformationTemplateFactory>
-X( , "fill in");
+static TransformFactoryRegistry::Add<QueryMangledNameFactory>
+X( "query-mangled", "will retrieve the mangled name inside the target area");
 
 // This anchor is used to force the linker to link in the generated object file
 // and thus register the factory.
-volatile int TransformationTemplateTransformAnchorSource = 0;
+volatile int QueryMangledNameTransformAnchorSource = 0;

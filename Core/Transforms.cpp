@@ -35,7 +35,8 @@ void Transforms::registerTransforms() {
   for (TransformFactoryRegistry::iterator I = TransformFactoryRegistry::begin(),
                                           E = TransformFactoryRegistry::end();
        I != E; ++I){
-      cout << "name of transform " << I->getName() << endl;
+
+    cout << "name of transform " << I->getName() << endl;
     Options[I->getName()] = new cl::opt<bool>(
         I->getName(), cl::desc(I->getDesc()), cl::cat(TransformCategory));
   }
@@ -72,4 +73,13 @@ Transforms::createSelectedTransforms(const TransformOptions &GlobalOptions,
       llvm::errs() << "note: " << '-' << I->getName()
                    << ": transform not available for specified compilers\n";
   }
+}
+
+void
+Transforms::orderByPrioity() {
+    std::sort( ChosenTransforms.begin(), ChosenTransforms.end(), 
+	[]( Transform* a, Transform* b ) {
+	      return a->priority < b->priority;
+	}
+    );
 }

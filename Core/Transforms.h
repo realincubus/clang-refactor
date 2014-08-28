@@ -63,6 +63,11 @@ public:
   void createSelectedTransforms(const TransformOptions &Options,
                                 const CompilerVersions &RequiredVersions);
 
+  /// \brief order the transformations by their priority
+  ///
+  /// Call *after* createSelectedTransforms
+  void orderByPrioity();
+
   /// \brief Return an iterator to the start of a container of instantiated
   /// transforms.
   const_iterator begin() const { return ChosenTransforms.begin(); }

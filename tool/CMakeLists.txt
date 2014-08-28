@@ -68,6 +68,9 @@ list(APPEND ClangModernizeSources ${ExtractMethodSources})
 file(GLOB_RECURSE RenameVariableSources "../RenameVariable/*.cpp")
 list(APPEND ClangModernizeSources ${RenameVariableSources})
 
+file(GLOB_RECURSE RenameFunctionSources "../RenameFunction/*.cpp")
+list(APPEND ClangModernizeSources ${RenameFunctionSources})
+
 file(GLOB_RECURSE UseStdArraySources "../UseStdArray/*.cpp")
 list(APPEND ClangModernizeSources ${UseStdArraySources})
 
@@ -124,6 +127,9 @@ list(APPEND ClangModernizeSources ${FuseToSimdVectorSources})
 
 file(GLOB_RECURSE UseFullyQualifiedTypesSources "../UseFullyQualifiedTypes/*.cpp")
 list(APPEND ClangModernizeSources ${UseFullyQualifiedTypesSources})
+
+file(GLOB_RECURSE QueryMangledNameSources "../QueryMangledName/*.cpp")
+list(APPEND ClangModernizeSources ${QueryMangledNameSources})
 
 add_clang_executable(clang-refactor
   ${ClangModernizeSources}

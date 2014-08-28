@@ -138,6 +138,8 @@ public:
 	     column_end );
   }
 
+  int priority = 100;
+
   template <typename T>
   bool isTarget( T* obj, clang::SourceManager& SM ){
     auto start_loc = obj->getLocStart();
@@ -172,6 +174,13 @@ public:
 	return true;
     }
     return false;
+  }
+
+  bool isFoundMangledName = false;
+  std::string foundMangledName;
+  void setFoundMangledName( std::string mangledName ) {
+      isFoundMangledName = true;
+      foundMangledName = mangledName;
   }
 
 

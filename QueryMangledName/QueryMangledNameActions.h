@@ -1,4 +1,4 @@
-//===-- TransformationTemplate/TransformationTemplateActions.h - Matcher callback ----------*- C++ -*-===//
+//===-- QueryMangledName/QueryMangledNameActions.h - Matcher callback ----------*- C++ -*-===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -8,7 +8,7 @@
 //===----------------------------------------------------------------------===//
 ///
 /// \file
-/// \brief This file contains the declaration of the TransformationTemplateFixer class which
+/// \brief This file contains the declaration of the QueryMangledNameFixer class which
 /// is used as a ASTMatcher callback.
 ///
 //===----------------------------------------------------------------------===//
@@ -25,9 +25,9 @@ typedef llvm::SmallVector<llvm::StringRef, 1> UserMacroNames;
 
 /// \brief The callback to be used for nullptr migration matchers.
 ///
-class TransformationTemplateFixer : public clang::ast_matchers::MatchFinder::MatchCallback {
+class QueryMangledNameFixer : public clang::ast_matchers::MatchFinder::MatchCallback {
 public:
-  TransformationTemplateFixer(unsigned &AcceptedChanges, Transform &Owner) :
+  QueryMangledNameFixer(unsigned &AcceptedChanges, Transform &Owner) :
       AcceptedChanges(AcceptedChanges), 
       Owner(Owner) 
   {
