@@ -63,20 +63,7 @@ void RenameVariableFixer::run(const ast_matchers::MatchFinder::MatchResult &Resu
 	//                 name in the declaration
 	SourceLocation StartLoc = value_decl->getLocEnd();
 	SourceLocation EndLoc = StartLoc;
-#if 0
-	std::string initializer_string = "";
-        // handle initializers
-	if ( const auto* var_decl = dyn_cast_or_null<const VarDecl>(value_decl) ){
-	    if ( var_decl->hasInit() ){ 
-		auto decl_init = var_decl->getInit();
-		initializer_string = string(" = ") + getString( decl_init, SM );
-	    }
-	}
-#endif
-#if 0
-	const auto* type_loc = Result.Nodes.getNodeAs<TypeLoc>("type_loc");
-	auto type_string = getString( type_loc, SM );
-#endif
+
 	auto replacement = Owner.new_name;
 	
 	llvm::errs() << "inserting replacement for declaration\n";
