@@ -75,6 +75,7 @@ Transforms::createSelectedTransforms(const TransformOptions &GlobalOptions,
   }
 }
 
+
 void
 Transforms::orderByPrioity() {
     std::sort( ChosenTransforms.begin(), ChosenTransforms.end(), 

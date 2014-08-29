@@ -58,6 +58,12 @@ void RenameVariableFixer::run(const ast_matchers::MatchFinder::MatchResult &Resu
 	}
 	isReplaced.push_back( value_decl );
 
+	// FIXME CRITICAL: this works. but i highly doubt thats the way it should work
+	//                 i simply cant find out how to get the source location of the 
+	//                 name in the declaration
+	SourceLocation StartLoc = value_decl->getLocEnd();
+	SourceLocation EndLoc = StartLoc;
+#if 0
 	std::string initializer_string = "";
         // handle initializers
 	if ( const auto* var_decl = dyn_cast_or_null<const VarDecl>(value_decl) ){
@@ -66,12 +72,12 @@ void RenameVariableFixer::run(const ast_matchers::MatchFinder::MatchResult &Resu
 		initializer_string = string(" = ") + getString( decl_init, SM );
 	    }
 	}
-	SourceLocation StartLoc = value_decl->getLocStart();
-	SourceLocation EndLoc = value_decl->getLocEnd();
+#endif
+#if 0
 	const auto* type_loc = Result.Nodes.getNodeAs<TypeLoc>("type_loc");
 	auto type_string = getString( type_loc, SM );
-
-	auto replacement = type_string + string(" ") + Owner.new_name + initializer_string;
+#endif
+	auto replacement = Owner.new_name;
 	
 	llvm::errs() << "inserting replacement for declaration\n";
 	ReplaceWithString( Owner, SM, StartLoc, EndLoc, context, replacement );

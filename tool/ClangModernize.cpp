@@ -32,6 +32,9 @@
 #include "llvm/Support/Path.h"
 #include "llvm/Support/Signals.h"
 
+
+// TODO let -rename-variable imply -query-mangled
+
 namespace cl = llvm::cl;
 using namespace clang;
 using namespace clang::tooling;
@@ -508,7 +511,7 @@ int main(int argc, const char **argv) {
       return 1;
     }
 
-    // TODO if the query transformation was run store the result so one can use it later
+    // if the query transformation was run store the result so one can use it later
     if ( T->isFoundMangledName ) {
 	foundMangledName = T->foundMangledName;
 	isFoundMangledName = true;
