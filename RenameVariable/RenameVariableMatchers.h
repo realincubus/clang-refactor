@@ -28,6 +28,7 @@ extern const char *MatcherRenameVariableDeclID;
 /// Finding sequences of explict casts is necessary so that an entire sequence
 /// can be replaced instead of just the inner-most implicit cast.
 clang::ast_matchers::StatementMatcher makeRenameVariableMatcher();
+clang::ast_matchers::DeclarationMatcher makeFunctionDeclMatcher();
 //clang::ast_matchers::DeclarationMatcher makeRenameVariableMatcherDecl();
 
 #endif // CLANG_MODERNIZE_USE_NULLPTR_MATCHERS_H

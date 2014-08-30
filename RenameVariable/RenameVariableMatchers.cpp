@@ -22,20 +22,22 @@ using namespace clang;
 const char *MatcherRenameVariableID = "matcherRenameVariableID";
 const char *MatcherRenameVariableDeclID = "matcherRenameVariableDeclID";
 
-// TODO right now this just works with variables which have local storage
-//      the intresting part is, to transform variables in multiple files 
-//      this should in theory work via the compilation database
+// TODO put the varDecl in makeFunctionDeclMatcher
 StatementMatcher makeRenameVariableMatcher(){
     return anyOf(
 	declRefExpr(to(varDecl(
-	    //hasLocalStorage(),
 	    hasTypeLoc(typeLoc().bind("type_loc"))
 	))).bind(MatcherRenameVariableID),
+	callExpr(
+	).bind("call_expr"),
 	declStmt(hasSingleDecl(varDecl(
-	    //hasLocalStorage(),
 	    hasTypeLoc(typeLoc().bind("type_loc"))
 	).bind("decl")))
     );
+}
+
+DeclarationMatcher makeFunctionDeclMatcher(){
+    return functionDecl().bind("func_decl");
 }
 
 

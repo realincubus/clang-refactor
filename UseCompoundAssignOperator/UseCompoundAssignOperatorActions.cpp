@@ -61,6 +61,7 @@ void UseCompoundAssignOperatorFixer::run(const ast_matchers::MatchFinder::MatchR
   const BinaryOperator* assignOperator = Result.Nodes.getNodeAs<BinaryOperator>(MatcherUseCompoundAssignOperatorID);
   if ( !Owner.isInRange( assignOperator, SM ) ) return;
 
+  // FIXME CRITICAL / and - are not commutative
   if ( assignOperator ) {
     cout << "found a assign op" << endl;
     const Expr* lhs = assignOperator->getLHS();

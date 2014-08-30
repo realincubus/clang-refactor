@@ -68,6 +68,20 @@ void QueryMangledNameFixer::run(const ast_matchers::MatchFinder::MatchResult &Re
 	  }
       }
   }
+  {
+      // in case we marked a call expr
+      const auto* node = Result.Nodes.getNodeAs<CallExpr>("call_expr");
+      if ( node ) {
+	  if ( Owner.isTarget( node, SM ) ) {
+	      if ( auto function_decl = node->getDirectCallee() ) {
+		// put it to a string 
+	        mangle_context->mangleName(function_decl,sstr);
+	        Owner.setFoundMangledName(sstr.str());
+	      }
+	  }
+      }
+  }
+
 }
 
 
