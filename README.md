@@ -1,3 +1,5 @@
+![screen cast of a vi session using clang-refactor](screencast.gif)
+
 clang-refactor 
 ==============
 
