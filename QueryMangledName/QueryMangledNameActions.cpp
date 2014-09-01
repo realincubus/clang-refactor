@@ -41,17 +41,30 @@ void QueryMangledNameFixer::run(const ast_matchers::MatchFinder::MatchResult &Re
   ASTContext& context = *Result.Context;
   auto mangle_context = context.createMangleContext();
   SourceManager& SM = context.getSourceManager();
-  std::string str;
-  llvm::raw_string_ostream sstr(str);
+
+  auto getMangledName = [&](const NamedDecl* nd){ 
+      std::string str;
+      llvm::raw_string_ostream sstr(str);
+      if ( !isa<FunctionDecl>(nd) && !isa<VarDecl>(nd) ) {
+	  llvm::errs() << "return because not Function or VarDecl\n";
+	  return string("");
+      }
+      if ( isa<CXXConstructorDecl>(nd) || isa<CXXDestructorDecl>(nd) ) {
+	  llvm::errs() << "return because not Ctor or Dtor\n";
+	  return string("");
+      }
+      mangle_context->mangleName(nd,sstr);
+      return sstr.str();
+  };
 
   {
       // in case we marked a declaration
       const auto* node = Result.Nodes.getNodeAs<NamedDecl>(MatcherQueryMangledNameID);
       if ( node ) {
 	  if ( Owner.isTarget( node, SM ) ) {
-	      // put it to a string
-	      mangle_context->mangleName(node,sstr);
-	      Owner.setFoundMangledName(sstr.str());
+	      // filter structors
+	      auto mangled_name = getMangledName( node );
+	      Owner.setFoundMangledName(mangled_name);
 	  }
       }
   }
@@ -62,8 +75,8 @@ void QueryMangledNameFixer::run(const ast_matchers::MatchFinder::MatchResult &Re
 	  if ( Owner.isTarget( node, SM ) ) {
 	      if ( auto value_decl = node->getDecl() ) {
 		// put it to a string 
-	        mangle_context->mangleName(value_decl,sstr);
-	        Owner.setFoundMangledName(sstr.str());
+	        auto mangled_name = getMangledName( value_decl );
+	        Owner.setFoundMangledName(mangled_name);
 	      }
 	  }
       }
@@ -75,12 +88,39 @@ void QueryMangledNameFixer::run(const ast_matchers::MatchFinder::MatchResult &Re
 	  if ( Owner.isTarget( node, SM ) ) {
 	      if ( auto function_decl = node->getDirectCallee() ) {
 		// put it to a string 
-	        mangle_context->mangleName(function_decl,sstr);
-	        Owner.setFoundMangledName(sstr.str());
+		auto mangled_name = getMangledName( function_decl );
+	        Owner.setFoundMangledName(mangled_name);
 	      }
 	  }
       }
   }
+  {
+      // in case we marked a member call expr
+      const auto* node = Result.Nodes.getNodeAs<CXXMemberCallExpr>("member_call_expr");
+      if ( node ) {
+	  llvm::errs() << "found a member call expr\n";
+	  // test its callee not the whole expr
+	  auto callee = node->getCallee();
+	  callee->dumpColor();
+
+	  auto member_expr = dyn_cast_or_null<MemberExpr>(callee);
+	  auto member_loc = member_expr->getMemberLoc();
+
+	  member_expr->getLocStart().print( llvm::errs(), SM );
+	  member_loc.print( llvm::errs(), SM );
+	  
+	  if ( Owner.isTarget( member_loc, member_loc, SM ) ) {
+	      llvm::errs() << "it is the target\n";
+	      if ( auto method_decl = node->getMethodDecl() ) {
+		llvm::errs() << "got its method decl\n";
+		// put it to a string 
+		auto mangled_name = getMangledName( method_decl );
+	        Owner.setFoundMangledName(mangled_name);
+	      }
+	  }
+      }
+  }
+
 
 }
 

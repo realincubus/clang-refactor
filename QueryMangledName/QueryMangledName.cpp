@@ -29,6 +29,8 @@ int QueryMangledNameTransform::apply(const CompilationDatabase &Database,
                                const std::vector<std::string> &SourcePaths,
 			       const llvm::cl::list<std::string>& LineRanges 
 			       ) {
+    
+  llvm::errs() << "QueryMangledName begin\n";
   parsePositionArguments( LineRanges ); 
   ClangTool QueryMangledNameTool(Database, SourcePaths);
 
@@ -46,6 +48,8 @@ int QueryMangledNameTransform::apply(const CompilationDatabase &Database,
   }
 
   setAcceptedChanges(AcceptedChanges);
+
+  llvm::errs() << "QueryMangledName done\n";
 
   return 0;
 }

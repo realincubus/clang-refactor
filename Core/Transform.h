@@ -140,12 +140,7 @@ public:
 
   int priority = 100;
 
-  template <typename T>
-  bool isTarget( T* obj, clang::SourceManager& SM ){
-    auto start_loc = obj->getLocStart();
-    auto end_loc = obj->getLocEnd();
-    clang::FullSourceLoc full_start_loc( start_loc, SM );
-    clang::FullSourceLoc full_end_loc( end_loc, SM );
+  bool isTarget( clang::SourceLocation start_loc, clang::SourceLocation end_loc, clang::SourceManager& SM ){
     auto file_loc = SM.getFileLoc( start_loc );
     auto file_end_loc = SM.getFileLoc( end_loc );
     auto expr_line_begin = SM.getSpellingLineNumber(file_loc);
@@ -153,12 +148,9 @@ public:
     auto expr_line_end = SM.getSpellingLineNumber(file_end_loc);
     auto expr_column_end = SM.getSpellingColumnNumber(file_end_loc);
     auto filename = SM.getFilename( file_loc );
-    llvm::errs() << "filename: " << filename << 
-	expr_line_begin << ":" << expr_column_begin << " - " <<
-	expr_line_end << ":" << expr_column_end << "\n";
-    llvm::errs() << "target.filename: " << target.filename << "\n";
+    llvm::errs() << "target.filename: " << target.filename << " ?= " << filename  << "\n";
     // check the filename
-    if ( filename != target.filename ) {
+    if ( filename.compare(target.filename) != 0 ) {
 	llvm::errs() << "filename is wrong\n";
 	return false;
     }
@@ -176,15 +168,24 @@ public:
     return false;
   }
 
+  template <typename T>
+  bool isTarget( T* obj, clang::SourceManager& SM ){
+    auto start_loc = obj->getLocStart();
+    auto end_loc = obj->getLocEnd();
+    return isTarget( start_loc, end_loc, SM );
+  }
+
   bool isFoundMangledName = false;
   std::string foundMangledName;
   void setFoundMangledName( std::string mangledName ) {
+      if ( mangledName.compare("") == 0 ) return;
       isFoundMangledName = true;
       foundMangledName = mangledName;
+      llvm::errs() << "found mangled name " << foundMangledName << "\n";
   }
 
 
-  // added parts TODO let these things me inherited 
+  // added parts TODO let these things be inherited 
   std::string new_name = "default_name";
   std::list<RangeDiscriptor> line_ranges;
 

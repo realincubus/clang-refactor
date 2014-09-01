@@ -70,7 +70,7 @@ void RenameVariableFixer::run(const ast_matchers::MatchFinder::MatchResult &Resu
 	llvm::errs() << "inserting replacement for declaration\n";
 	ReplaceWithString( Owner, SM, StartLoc, EndLoc, context, replacement );
   };
-    auto replaceFunctionDeclare = [&]( const FunctionDecl* function_decl ) {
+  auto replaceFunctionDeclare = [&]( const FunctionDecl* function_decl ) {
 
 	static std::list<const ValueDecl*> isReplaced;
 
@@ -91,23 +91,32 @@ void RenameVariableFixer::run(const ast_matchers::MatchFinder::MatchResult &Resu
 	ReplaceWithString( Owner, SM, StartLoc, EndLoc, context, replacement );
   };
 
+  auto getMangledName = [&](const NamedDecl* nd){ 
+      std::string str;
+      llvm::raw_string_ostream sstr(str);
+      if ( !(isa<FunctionDecl>(nd) || isa<VarDecl>(nd)) ) return string("");
+      if ( isa<CXXConstructorDecl>(nd) || isa<CXXDestructorDecl>(nd) ) return string("");
+      mangle_context->mangleName(nd,sstr);
+      return sstr.str();
+  };
 
-  assert( Owner.isFoundMangledName && "mangled name was not found before" );
-  llvm::errs() << "foundMangledName " << Owner.foundMangledName << "\n";
+
+  if ( !Owner.isFoundMangledName ) {
+     llvm::errs() << "mangled name was not found before\n";
+     return;
+  }
 
   // case DeclRefExpr
   {
       const auto* node = Result.Nodes.getNodeAs<DeclRefExpr>(MatcherRenameVariableID);
       if ( node ) {
 	  auto* value_decl = node->getDecl();
-	  std::string str;
-	  llvm::raw_string_ostream sstr(str);
-	  mangle_context->mangleName(value_decl,sstr);
+	  auto mangled_name = getMangledName(value_decl);
 
-	  llvm::errs() << "calculated mangled name " << sstr.str() << "\n";
+	  llvm::errs() << "calculated mangled name " << mangled_name << "\n";
 
 	  // if the queried mangled name and the actual mangled name are not the same bail out
-	  if ( !(Owner.foundMangledName.compare( sstr.str() ) == 0) ) return;
+	  if ( !(Owner.foundMangledName.compare( mangled_name ) == 0) ) return;
 
 	  // TODO should not be needed anymore
 	  replaceDeclare( value_decl );
@@ -130,14 +139,12 @@ void RenameVariableFixer::run(const ast_matchers::MatchFinder::MatchResult &Resu
 	      assert( 0 && "critical error" );
 	      return;
 	  }
-	  std::string str;
-	  llvm::raw_string_ostream sstr(str);
-	  mangle_context->mangleName(function_decl,sstr);
+	  auto mangled_name = getMangledName(function_decl);
 
-	  llvm::errs() << "calculated mangled name " << sstr.str() << "\n";
+	  llvm::errs() << "calculated mangled name " << mangled_name << "\n";
 
 	  // if the queried mangled name and the actual mangled name are not the same bail out
-	  if ( !(Owner.foundMangledName.compare( sstr.str() ) == 0) ) return;
+	  if ( !(Owner.foundMangledName.compare( mangled_name ) == 0) ) return;
 
 	  // TODO should not be needed anymore
 	  replaceFunctionDeclare( function_decl );
@@ -151,18 +158,45 @@ void RenameVariableFixer::run(const ast_matchers::MatchFinder::MatchResult &Resu
       }
   }
 
+  // TODO merge with variable rename. code is nearly identical
+  // case CXXMemberCallExpr
+  {
+      const auto* node = Result.Nodes.getNodeAs<CXXMemberCallExpr>("member_call_expr");
+      if ( node ) {
+	  auto* method_decl = node->getMethodDecl();
+	  auto mangled_name = getMangledName(method_decl);
+
+	  llvm::errs() << "calculated mangled name " << mangled_name << "\n";
+
+	  // if the queried mangled name and the actual mangled name are not the same bail out
+	  if ( !(Owner.foundMangledName.compare( mangled_name ) == 0) ) return;
+
+	  // TODO should not be needed anymore
+	  replaceFunctionDeclare( method_decl );
+
+	  auto callee = node->getCallee();
+	  if ( auto member_expr = dyn_cast_or_null<MemberExpr>(callee) ){
+	      auto member_loc = member_expr->getMemberLoc();
+	      
+	      SourceLocation StartLoc = member_loc;
+	      SourceLocation EndLoc = member_loc;
+
+	      ReplaceWithString( Owner, SM, StartLoc, EndLoc, context, Owner.new_name );
+	  }
+      }
+  }
+
    auto isSearchedDecl = [&](const ValueDecl* node){ 
       if ( node ) {
 	  auto* value_decl = static_cast<const ValueDecl*>(node);
-	  std::string str;
-	  llvm::raw_string_ostream sstr(str);
-	  mangle_context->mangleName(value_decl,sstr);
+	  auto mangled_name = getMangledName( value_decl );
 
 	  // if the queried mangled name and the actual mangled name are not the same bail out
-	  if ( !(Owner.foundMangledName.compare( sstr.str() ) == 0) ) return false;
+	  if ( !(Owner.foundMangledName.compare( mangled_name ) == 0) ) return false;
 
 	  return true;
       }
+      return false;
   };
 
   // case VarDecl
@@ -176,6 +210,13 @@ void RenameVariableFixer::run(const ast_matchers::MatchFinder::MatchResult &Resu
   // case FunctionDecl
   {
       const auto* node = Result.Nodes.getNodeAs<FunctionDecl>("func_decl");
+      if( isSearchedDecl( node ) ) {
+	  replaceFunctionDeclare( node );
+      }
+  }
+  // case CXXMemberDecl
+  {
+      const auto* node = Result.Nodes.getNodeAs<CXXMethodDecl>("method_decl");
       if( isSearchedDecl( node ) ) {
 	  replaceFunctionDeclare( node );
       }

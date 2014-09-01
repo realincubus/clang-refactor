@@ -29,7 +29,11 @@ StatementMatcher makeRenameVariableMatcher(){
 	    hasTypeLoc(typeLoc().bind("type_loc"))
 	))).bind(MatcherRenameVariableID),
 	callExpr(
+	    unless(
+		memberCallExpr()
+	    )
 	).bind("call_expr"),
+	memberCallExpr().bind("member_call_expr"),
 	declStmt(hasSingleDecl(varDecl(
 	    hasTypeLoc(typeLoc().bind("type_loc"))
 	).bind("decl")))
@@ -37,7 +41,10 @@ StatementMatcher makeRenameVariableMatcher(){
 }
 
 DeclarationMatcher makeFunctionDeclMatcher(){
-    return functionDecl().bind("func_decl");
+    return anyOf(
+	functionDecl().bind("func_decl"),
+	methodDecl().bind("method_decl")
+    );
 }
 
 

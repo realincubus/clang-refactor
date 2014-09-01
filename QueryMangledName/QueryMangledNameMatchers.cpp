@@ -29,7 +29,8 @@ DeclarationMatcher makeQueryMangledNameMatcher(){
 StatementMatcher makeQueryMangledNameMatcherRef	() {
     return anyOf(
 	    declRefExpr().bind("decl_ref"),
-	    callExpr().bind("call_expr")
+	    callExpr(unless(memberCallExpr())).bind("call_expr"),
+	    memberCallExpr().bind("member_call_expr")
     );
 }
 
