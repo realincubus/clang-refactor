@@ -29,19 +29,19 @@ SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Og" )
 #file(GLOB_RECURSE RemoveUnusedParameterSources "../RemoveUnusedParameter/*.cpp")
 #list(APPEND ClangModernizeSources ${RemoveUnusedParameterSources})
 
-file(GLOB_RECURSE UsePowerOperatorSources "../UsePowerOperator/*.cpp")
+file(GLOB_RECURSE UsePowerOperatorSources "../Transformations/UsePowerOperator/*.cpp")
 list(APPEND ClangModernizeSources ${UsePowerOperatorSources})
 
-file(GLOB_RECURSE UseCompoundAssignOperatorSources "../UseCompoundAssignOperator/*.cpp")
+file(GLOB_RECURSE UseCompoundAssignOperatorSources "../Transformations/UseCompoundAssignOperator/*.cpp")
 list(APPEND ClangModernizeSources ${UseCompoundAssignOperatorSources})
 
-file(GLOB_RECURSE UseUnaryOperatorSources "../UseUnaryOperator/*.cpp")
+file(GLOB_RECURSE UseUnaryOperatorSources "../Transformations/UseUnaryOperator/*.cpp")
 list(APPEND ClangModernizeSources ${UseUnaryOperatorSources})
 
-file(GLOB_RECURSE RemoveIdentityOperationsSources "../RemoveIdentityOperations/*.cpp")
+file(GLOB_RECURSE RemoveIdentityOperationsSources "../Transformations/RemoveIdentityOperations/*.cpp")
 list(APPEND ClangModernizeSources ${RemoveIdentityOperationsSources})
 
-file(GLOB_RECURSE UseHypotSources "../UseHypot/*.cpp")
+file(GLOB_RECURSE UseHypotSources "../Transformations/UseHypot/*.cpp")
 list(APPEND ClangModernizeSources ${UseHypotSources})
 
 #file(GLOB_RECURSE UseExpMinusOneSources "../UseExpMinusOne/*.cpp")
@@ -50,85 +50,85 @@ list(APPEND ClangModernizeSources ${UseHypotSources})
 #file(GLOB_RECURSE UseFMASources "../UseFusedMultiplyAdd/*.cpp")
 #list(APPEND ClangModernizeSources ${UseFMASources})
 
-file(GLOB_RECURSE UseMathConstantsSources "../UseMathConstants/*.cpp")
+file(GLOB_RECURSE UseMathConstantsSources "../Transformations/UseMathConstants/*.cpp")
 list(APPEND ClangModernizeSources ${UseMathConstantsSources})
 
-file(GLOB_RECURSE UseRoundSources "../UseRound/*.cpp")
+file(GLOB_RECURSE UseRoundSources "../Transformations/UseRound/*.cpp")
 list(APPEND ClangModernizeSources ${UseRoundSources})
 
-file(GLOB_RECURSE RepairBrokenNullCheckSources "../RepairBrokenNullCheck/*.cpp")
+file(GLOB_RECURSE RepairBrokenNullCheckSources "../Transformations/RepairBrokenNullCheck/*.cpp")
 list(APPEND ClangModernizeSources ${RepairBrokenNullCheckSources})
 
-file(GLOB_RECURSE CollapseIfStatementSources "../CollapsIfStatement/*.cpp")
+file(GLOB_RECURSE CollapseIfStatementSources "../Transformations/CollapsIfStatement/*.cpp")
 list(APPEND ClangModernizeSources ${CollapseIfStatementSources})
 
-file(GLOB_RECURSE ExtractMethodSources "../ExtractMethod/*.cpp")
+file(GLOB_RECURSE ExtractMethodSources "../Transformations/ExtractMethod/*.cpp")
 list(APPEND ClangModernizeSources ${ExtractMethodSources})
 
-file(GLOB_RECURSE RenameVariableSources "../RenameVariable/*.cpp")
+file(GLOB_RECURSE RenameVariableSources "../Transformations/RenameVariable/*.cpp")
 list(APPEND ClangModernizeSources ${RenameVariableSources})
 
-file(GLOB_RECURSE RenameFunctionSources "../RenameFunction/*.cpp")
+file(GLOB_RECURSE RenameFunctionSources "../Transformations/RenameFunction/*.cpp")
 list(APPEND ClangModernizeSources ${RenameFunctionSources})
 
-file(GLOB_RECURSE UseStdArraySources "../UseStdArray/*.cpp")
+file(GLOB_RECURSE UseStdArraySources "../Transformations/UseStdArray/*.cpp")
 list(APPEND ClangModernizeSources ${UseStdArraySources})
 
-file(GLOB_RECURSE UseVectorSources "../UseVector/*.cpp")
+file(GLOB_RECURSE UseVectorSources "../Transformations/UseVector/*.cpp")
 list(APPEND ClangModernizeSources ${UseVectorSources})
 
-file(GLOB_RECURSE UseEmplaceSources "../UseEmplace/*.cpp")
+file(GLOB_RECURSE UseEmplaceSources "../Transformations/UseEmplace/*.cpp")
 list(APPEND ClangModernizeSources ${UseEmplaceSources})
 
-file(GLOB_RECURSE UnInvertLogicSources "../UnInvertLogic/*.cpp")
+file(GLOB_RECURSE UnInvertLogicSources "../Transformations/UnInvertLogic/*.cpp")
 list(APPEND ClangModernizeSources ${UnInvertLogicSources})
 
-file(GLOB_RECURSE RemoveRedundantConditionalSources "../RemoveRedudantConditional/*.cpp")
+file(GLOB_RECURSE RemoveRedundantConditionalSources "../Transformations/RemoveRedudantConditional/*.cpp")
 list(APPEND ClangModernizeSources ${RemoveRedundantConditionalSources})
 
-file(GLOB_RECURSE UseEmptySources "../UseEmpty/*.cpp")
+file(GLOB_RECURSE UseEmptySources "../Transformations/UseEmpty/*.cpp")
 list(APPEND ClangModernizeSources ${UseEmptySources})
 
-file(GLOB_RECURSE PullTemporariesSources "../PullTemporaries/*.cpp")
+file(GLOB_RECURSE PullTemporariesSources "../Transformations/PullTemporaries/*.cpp")
 list(APPEND ClangModernizeSources ${PullTemporariesSources})
 
-file(GLOB_RECURSE UseRAIISources "../UseRAII/*.cpp")
+file(GLOB_RECURSE UseRAIISources "../Transformations/UseRAII/*.cpp")
 list(APPEND ClangModernizeSources ${UseRAIISources})
 
-file(GLOB_RECURSE UseLocalIteratorInForLoopSources "../UseLocalIteratorInForLoop/*.cpp")
+file(GLOB_RECURSE UseLocalIteratorInForLoopSources "../Transformations/UseLocalIteratorInForLoop/*.cpp")
 list(APPEND ClangModernizeSources ${UseLocalIteratorInForLoopSources})
 
-file(GLOB_RECURSE MoveToFirstUsageSources "../MoveToFirstUsage/*.cpp")
+file(GLOB_RECURSE MoveToFirstUsageSources "../Transformations/MoveToFirstUsage/*.cpp")
 list(APPEND ClangModernizeSources ${MoveToFirstUsageSources})
 
-file(GLOB_RECURSE UseConstSources "../UseConst/*.cpp")
+file(GLOB_RECURSE UseConstSources "../Transformations/UseConst/*.cpp")
 list(APPEND ClangModernizeSources ${UseConstSources})
 
-file(GLOB_RECURSE ForLoopStartFromZeroSources "../ForLoopStartFromZero/*.cpp")
+file(GLOB_RECURSE ForLoopStartFromZeroSources "../Transformations/ForLoopStartFromZero/*.cpp")
 list(APPEND ClangModernizeSources ${ForLoopStartFromZeroSources})
 
 #file(GLOB_RECURSE UseAsyncSources "../UseAsync/*.cpp")
 #list(APPEND ClangModernizeSources ${UseAsyncSources})
 
-file(GLOB_RECURSE UseAlgorithmsSources "../UseAlgorithms/*.cpp")
+file(GLOB_RECURSE UseAlgorithmsSources "../Transformations/UseAlgorithms/*.cpp")
 list(APPEND ClangModernizeSources ${UseAlgorithmsSources})
 
-file(GLOB_RECURSE UnglobalMethodSources "../UnglobalMethod/*.cpp")
+file(GLOB_RECURSE UnglobalMethodSources "../Transformations/UnglobalMethod/*.cpp")
 list(APPEND ClangModernizeSources ${UnglobalMethodSources})
 
-file(GLOB_RECURSE NestedIndexRenamerSources "../NestedIndexRenamer/*.cpp")
+file(GLOB_RECURSE NestedIndexRenamerSources "../Transformations/NestedIndexRenamer/*.cpp")
 list(APPEND ClangModernizeSources ${NestedIndexRenamerSources})
 
-file(GLOB_RECURSE UseSwapSources "../UseSwap/*.cpp")
+file(GLOB_RECURSE UseSwapSources "../Transformations/UseSwap/*.cpp")
 list(APPEND ClangModernizeSources ${UseSwapSources})
 
-file(GLOB_RECURSE FuseToSimdVectorSources "../FuseToSimdVector/*.cpp")
+file(GLOB_RECURSE FuseToSimdVectorSources "../Transformations/FuseToSimdVector/*.cpp")
 list(APPEND ClangModernizeSources ${FuseToSimdVectorSources})
 
-file(GLOB_RECURSE UseFullyQualifiedTypesSources "../UseFullyQualifiedTypes/*.cpp")
+file(GLOB_RECURSE UseFullyQualifiedTypesSources "../Transformations/UseFullyQualifiedTypes/*.cpp")
 list(APPEND ClangModernizeSources ${UseFullyQualifiedTypesSources})
 
-file(GLOB_RECURSE QueryMangledNameSources "../QueryMangledName/*.cpp")
+file(GLOB_RECURSE QueryMangledNameSources "../Queries/QueryMangledName/*.cpp")
 list(APPEND ClangModernizeSources ${QueryMangledNameSources})
 
 add_clang_executable(clang-refactor
