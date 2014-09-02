@@ -7,8 +7,8 @@ set (ClangModernizeSources
 # FIXME: Lib-ify the transforms to simplify the build rules.
 SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Og" )
 
-#file(GLOB_RECURSE MoveToFirstUsageSources "../Transformations/MoveToFirstUsage/*.cpp")
-#ist(APPEND ClangModernizeSources ${MoveToFirstUsageSources})
+file(GLOB_RECURSE UseAsyncSources "../Transformations/UseAsync/*.cpp")
+ist(APPEND ClangModernizeSources ${UseAsyncUsageSources})
 
 add_clang_executable(clang-refactor
   ${ClangModernizeSources}
