@@ -105,9 +105,6 @@ void QueryMangledNameFixer::run(const ast_matchers::MatchFinder::MatchResult &Re
 
 	  auto member_expr = dyn_cast_or_null<MemberExpr>(callee);
 	  auto member_loc = member_expr->getMemberLoc();
-
-	  member_expr->getLocStart().print( llvm::errs(), SM );
-	  member_loc.print( llvm::errs(), SM );
 	  
 	  if ( Owner.isTarget( member_loc, member_loc, SM ) ) {
 	      llvm::errs() << "it is the target\n";
