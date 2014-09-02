@@ -98,9 +98,6 @@ list(APPEND ClangModernizeSources ${UseRAIISources})
 file(GLOB_RECURSE UseLocalIteratorInForLoopSources "../Transformations/UseLocalIteratorInForLoop/*.cpp")
 list(APPEND ClangModernizeSources ${UseLocalIteratorInForLoopSources})
 
-file(GLOB_RECURSE MoveToFirstUsageSources "../Transformations/MoveToFirstUsage/*.cpp")
-list(APPEND ClangModernizeSources ${MoveToFirstUsageSources})
-
 file(GLOB_RECURSE UseConstSources "../Transformations/UseConst/*.cpp")
 list(APPEND ClangModernizeSources ${UseConstSources})
 
