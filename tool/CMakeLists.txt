@@ -7,8 +7,11 @@ set (ClangModernizeSources
 # FIXME: Lib-ify the transforms to simplify the build rules.
 SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Og" )
 
+file(GLOB_RECURSE QueryUsagesSources "../Queries/QueryUsages/*.cpp")
+list(APPEND ClangModernizeSources ${QueryUsagesSources})
+
 file(GLOB_RECURSE UnglobalMethodSources "../Transformations/UnglobalMethod/*.cpp")
-ist(APPEND ClangModernizeSources ${UnglobalMethodSources})
+list(APPEND ClangModernizeSources ${UnglobalMethodSources})
 
 add_clang_executable(clang-refactor
   ${ClangModernizeSources}
