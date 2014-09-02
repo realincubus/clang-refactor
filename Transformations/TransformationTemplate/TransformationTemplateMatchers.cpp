@@ -9,7 +9,6 @@
 ///
 /// \file
 /// \brief This file contains the definitions for matcher-generating functions
-/// and a custom AST_MATCHER for identifying casts of type CK_NullTo*.
 ///
 //===----------------------------------------------------------------------===//
 

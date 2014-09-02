@@ -13,18 +13,12 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#ifndef CLANG_MODERNIZE_NULLPTR_ACTIONS_H
-#define CLANG_MODERNIZE_NULLPTR_ACTIONS_H
+#pragma once
 
 #include "Core/Transform.h"
 #include "clang/ASTMatchers/ASTMatchFinder.h"
 #include "clang/Tooling/Refactoring.h"
 
-// The type for user-defined macro names that behave like NULL
-typedef llvm::SmallVector<llvm::StringRef, 1> UserMacroNames;
-
-/// \brief The callback to be used for nullptr migration matchers.
-///
 class TransformationTemplateFixer : public clang::ast_matchers::MatchFinder::MatchCallback {
 public:
   TransformationTemplateFixer(unsigned &AcceptedChanges, Transform &Owner) :
@@ -41,5 +35,3 @@ private:
   unsigned &AcceptedChanges;
   Transform &Owner;
 };
-
-#endif // CLANG_MODERNIZE_NULLPTR_ACTIONS_H
