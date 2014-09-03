@@ -1,4 +1,4 @@
-//===-- RenameVariable/RenameVariableMatchers.cpp - Matchers for null casts ----------===//
+//===-- Rename/RenameMatchers.cpp - Matchers for null casts ----------===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -13,21 +13,21 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#include "RenameVariableMatchers.h"
+#include "RenameMatchers.h"
 #include "clang/AST/ASTContext.h"
 
 using namespace clang::ast_matchers;
 using namespace clang;
 
-const char *MatcherRenameVariableID = "matcherRenameVariableID";
-const char *MatcherRenameVariableDeclID = "matcherRenameVariableDeclID";
+const char *MatcherRenameID = "matcherRenameID";
+const char *MatcherRenameDeclID = "matcherRenameDeclID";
 
 // TODO put the varDecl in makeFunctionDeclMatcher
-StatementMatcher makeRenameVariableMatcher(){
+StatementMatcher makeRenameMatcher(){
     return anyOf(
 	declRefExpr(to(varDecl(
 	    hasTypeLoc(typeLoc().bind("type_loc"))
-	))).bind(MatcherRenameVariableID),
+	))).bind(MatcherRenameID),
 	callExpr(
 	    unless(
 		memberCallExpr()

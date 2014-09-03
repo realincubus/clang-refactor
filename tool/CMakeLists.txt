@@ -37,8 +37,8 @@ list(APPEND ClangModernizeSources ${CollapseIfStatementSources})
 file(GLOB_RECURSE ExtractMethodSources "../Transformations/ExtractMethod/*.cpp")
 list(APPEND ClangModernizeSources ${ExtractMethodSources})
 
-file(GLOB_RECURSE RenameVariableSources "../Transformations/RenameVariable/*.cpp")
-list(APPEND ClangModernizeSources ${RenameVariableSources})
+file(GLOB_RECURSE RenameSources "../Transformations/Rename/*.cpp")
+list(APPEND ClangModernizeSources ${RenameSources})
 
 file(GLOB_RECURSE UseStdArraySources "../Transformations/UseStdArray/*.cpp")
 list(APPEND ClangModernizeSources ${UseStdArraySources})

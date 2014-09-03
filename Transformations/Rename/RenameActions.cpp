@@ -1,4 +1,4 @@
-//===-- RenameVariable/RenameVariableActions.cpp - Matcher callback ------------------===//
+//===-- Rename/RenameActions.cpp - Matcher callback ------------------===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -8,14 +8,14 @@
 //===----------------------------------------------------------------------===//
 ///
 /// \file
-/// \brief This file contains the definition of the RenameVariableFixer class which is
+/// \brief This file contains the definition of the RenameFixer class which is
 /// used as an ASTMatcher callback. Also within this file is a helper AST
 /// visitor class used to identify sequences of explicit casts.
 ///
 //===----------------------------------------------------------------------===//
 
-#include "RenameVariableActions.h"
-#include "RenameVariableMatchers.h"
+#include "RenameActions.h"
+#include "RenameMatchers.h"
 
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/RecursiveASTVisitor.h"
@@ -35,14 +35,14 @@ using namespace clang;
 
 using namespace TransformationUtility;
 
-RenameVariableFixer::RenameVariableFixer(unsigned &AcceptedChanges,
+RenameFixer::RenameFixer(unsigned &AcceptedChanges,
                            Transform &Owner)
     : AcceptedChanges(AcceptedChanges), Owner(Owner) {
 }
 
 
 
-void RenameVariableFixer::run(const ast_matchers::MatchFinder::MatchResult &Result) {
+void RenameFixer::run(const ast_matchers::MatchFinder::MatchResult &Result) {
   using namespace std;
   ASTContext& context = *Result.Context;
   SourceManager& SM = context.getSourceManager();
@@ -108,7 +108,7 @@ void RenameVariableFixer::run(const ast_matchers::MatchFinder::MatchResult &Resu
 
   // case DeclRefExpr
   {
-      const auto* node = Result.Nodes.getNodeAs<DeclRefExpr>(MatcherRenameVariableID);
+      const auto* node = Result.Nodes.getNodeAs<DeclRefExpr>(MatcherRenameID);
       if ( node ) {
 	  auto* value_decl = node->getDecl();
 	  auto mangled_name = getMangledName(value_decl);

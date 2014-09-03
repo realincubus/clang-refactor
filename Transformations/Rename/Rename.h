@@ -1,4 +1,4 @@
-//===-- RenameVariable/RenameVariable.h - C++11 nullptr migration -------*- C++ -*-===//
+//===-- Rename/Rename.h - C++11 nullptr migration -------*- C++ -*-===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -8,7 +8,7 @@
 //===----------------------------------------------------------------------===//
 ///
 /// \file
-/// \brief This file provides the definition of the RenameVariableTransform
+/// \brief This file provides the definition of the RenameTransform
 /// class which is the main interface to the use-nullptr transform that tries to
 /// make use of nullptr where possible.
 ///
@@ -22,10 +22,10 @@
 
 /// \brief Subclass of Transform that transforms null pointer constants into
 /// C++11's nullptr keyword where possible.
-class RenameVariableTransform : public Transform {
+class RenameTransform : public Transform {
 public:
-  RenameVariableTransform(const TransformOptions &Options)
-      : Transform("RenameVariable", Options) {}
+  RenameTransform(const TransformOptions &Options)
+      : Transform("Rename", Options) {}
 
   /// \see Transform::run().
   virtual int apply(const clang::tooling::CompilationDatabase &Database,

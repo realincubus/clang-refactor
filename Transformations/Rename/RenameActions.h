@@ -1,4 +1,4 @@
-//===-- RenameVariable/RenameVariableActions.h - Matcher callback ----------*- C++ -*-===//
+//===-- Rename/RenameActions.h - Matcher callback ----------*- C++ -*-===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -8,7 +8,7 @@
 //===----------------------------------------------------------------------===//
 ///
 /// \file
-/// \brief This file contains the declaration of the RenameVariableFixer class which
+/// \brief This file contains the declaration of the RenameFixer class which
 /// is used as a ASTMatcher callback.
 ///
 //===----------------------------------------------------------------------===//
@@ -25,9 +25,9 @@ typedef llvm::SmallVector<llvm::StringRef, 1> UserMacroNames;
 
 /// \brief The callback to be used for nullptr migration matchers.
 ///
-class RenameVariableFixer : public clang::ast_matchers::MatchFinder::MatchCallback {
+class RenameFixer : public clang::ast_matchers::MatchFinder::MatchCallback {
 public:
-  RenameVariableFixer(unsigned &AcceptedChanges, Transform &Owner);
+  RenameFixer(unsigned &AcceptedChanges, Transform &Owner);
 
   /// \brief Entry point to the callback called when matches are made.
   virtual void run(const clang::ast_matchers::MatchFinder::MatchResult &Result);
