@@ -3,21 +3,22 @@
 clang-refactor 
 ==============
 
-This is a early attempt to write a refactor for c and c++ programs based on clang-modernize and oclint rules.
+This is a refactor for C and C++ programs based on clang-modernize and oclint rules.
 
-in order to get refactoring for c++ i started to implement some refactorings.
-i can not garantee that these will not break your code.
-my aim is to improve the refactorings so that the code will stay intact.
-the refactor is intended to run stand alone and can be integrated into editors by very simple 
-plugins. 
+In order to get refactoring for c++, I started to implement some basic refactorings.
+I can not garantee that these will not break your code, so use version control.
+The refactor is intended to be usable as a stand alone application,
+but can be integrated into editors by very simple plugins. 
 
-i already wrote a plugin for vim 
-
-[vim-clang-refactor]: https://github.com/realincubus/vim-clang-refactor
+I already wrote a plugin for vim
+[vim-clang-refactor](https://github.com/realincubus/vim-clang-refactor)
 
 ### Installation
 
-in a stable llvm+clang+extra-tools build do
+For building clang-refactor you need a stable llvm+clang+extra-tools build.
+[clang getting started](http://clang.llvm.org/get_started.html)
+
+In a stable llvm+clang+extra-tools build do
 ```sh
 git clone https://github.com/realincubus/clang-refactor.git ${LLVM_ROOT}/tools/clang/tools/extra/clang-refactor
 ``` 
@@ -25,17 +26,17 @@ git clone https://github.com/realincubus/clang-refactor.git ${LLVM_ROOT}/tools/c
 and add `add_subdirectory(clang-refactor)` to `${LLVM_ROOT}/tools/clang/tools/extra/CMakeLists.txt`
 this will add the refactor to the build chain.
 
-now go to `${LLVM_BUILD_DIR}` and run make ( to speed it up `make -j ${number_of_threads}` )
-the executable will go to `${LLVM_BUILD_DIR}/bin`
+Now go to `${LLVM_BUILD_DIR}` and run make ( to speed it up `make -j ${number_of_threads}` )
+the executable will go to `${LLVM_BUILD_DIR}/bin`.
 
-i did not try to but running `sudo make install` should install this on your system.
-if you did not install this remember to put `${LLVM_BUILD_DIR}/bin` into your PATH variable.
+I did not try, but running `sudo make install` should install this on your system.
+If you did not install, remember to put `${LLVM_BUILD_DIR}/bin` into your PATH.
 
 ### Project Setup
 
-just as clang-modernize the program needs a compile_commands.json file.
-the easiest way to generate one is to use cmake.
-simply add `SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)` to your CMakeLists.txt
+Just as clang-modernize the program needs a compile_commands.json file.
+The easiest way to generate one is to use cmake.
+Simply add `SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)` to your CMakeLists.txt
 
 ### Refactorings
 
@@ -69,15 +70,67 @@ you can get a list of available transformations from clang-refactor with `clang-
 -  -use-unary-operators          - transforms b += 1 to ++b
 -  -use-vector                   - fill in
 
-some of these transformations where devoloped for another project and are very specific,
-others are still very buggy. the transformations do some checks but the checks are not perfect so 
-they can possibly transform code and change semantics!!!
+The transformations do some checks but the checks are not perfect so 
+they can possibly transform code and change semantics! 
+If you already use some version control system commit your changes befor using the refactor,
+so you can get back to the original state.
 
-to run a refactoring on a whole file, go to the directory and run 
 
+### Usage
+
+#### Single file
+To run a refactoring on a file, go to the directory and run 
 ```sh
 clang-refactor -use-pow main.cpp
 ```
+This will transform all occurences of something like (a*b*c)*(a*b*c) to pow(a*b*c,2).
+
+If you wish to apply the transformation just to some specific range of lines add the lines flag
+
+```sh
+clang-refactor -use-pow -lines=10-1:20-2 main.cpp
+```
+
+#### Multiple files
+
+If you want to apply a transformation to the whole list of files in the compile_commands.json file,
+do it like this:
+
+```sh
+clang-refactor -use-pow -p ${PATH_TO_COMPILE_COMMANDS_FILE} \
+-include ${FOLDER_TO_INLCUDE} -exclude ${FOLDER_TO_EXCLUDE} 
+```
+
+Use include an exclude to specify folders with files that can be changed 
+and folders with files that must not be changed. This is nessicary since the compile_commands.json file
+does not contain information about headers.
+
+### Future plans
+
+This repository is the central part of a refactor but it needs some ui integration. 
+I already have a plugin for vim that passes the selected transfrom and lines to the refactor,
+but it would be nice to get some hints from the compiler to vim on where a transformation can be applied.
+
+Some plugins for vim like Syntastic and YouCompleteMe already show clangs errors and warnings.
+So one possible way is to add some custom warnings to clang so that these plugins could display them.
+But i dont want to change the compilers semantic analysis code, since this is nothing one can switch on and off.
+It would be better to write a plugin for clang.
+I know one can to this but i already tested and the warnings and errors produced by plugins dont show up in 
+Syntastic and YouCompleteMe.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
