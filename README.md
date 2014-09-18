@@ -32,6 +32,14 @@ the executable will go to `${LLVM_BUILD_DIR}/bin`.
 I did not try, but running `sudo make install` should install this on your system.
 If you did not install, remember to put `${LLVM_BUILD_DIR}/bin` into your PATH.
 
+#### Using the systems installation of clang
+If a recent clang or llvm is installed one can now compile clang-refactor without the need to have a llvm+clang+extratools tree.
+Checkout the standalone branch of this repos and run cmake.
+
+Tested on 
+  - Gentoo (clang 3.5.0)
+
+
 ### Project Setup
 
 Just as clang-modernize the program needs a compile_commands.json file.
