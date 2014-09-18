@@ -38,6 +38,7 @@ Checkout the standalone branch of this repos and run cmake.
 
 Tested on 
   - Gentoo (clang 3.5.0)
+  - Manjaro (clang 3.5.0) had to symlink libncurses to tinfo (ln -s /usr/lib/libncurses.so.5 /usr/lib/libtinfo.so)
 
 
 ### Project Setup
