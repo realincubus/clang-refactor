@@ -17,6 +17,7 @@
 #define CLANG_MODERNIZE_INCLUDEEXCLUDEINFO_H
 
 #include "llvm/ADT/StringRef.h"
+#include <llvm/Support/FileSystem.h>
 #include <system_error>
 #include <vector>
 

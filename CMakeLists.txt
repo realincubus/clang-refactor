@@ -1,6 +1,9 @@
+
+cmake_minimum_required(VERSION 2.8)
+
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
-  ${ClangReplaceLocation}
+  #${ClangReplaceLocation}
   )
 SET( CMAKE_EXPORT_COMPILE_COMMANDS on )
 

@@ -1,11 +1,11 @@
-set(LLVM_LINK_COMPONENTS support)
+#set(LLVM_LINK_COMPONENTS support)
 
 set (ClangModernizeSources
   ClangModernize.cpp
   )
 
 # FIXME: Lib-ify the transforms to simplify the build rules.
-SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Og" )
+SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Og -DCLANG_ENABLE_ARCMT -DCLANG_ENABLE_OBJC_REWRITER -DCLANG_ENABLE_STATIC_ANALYZER -DGTEST_HAS_RTTI=0 -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -fno-rtti -fPIC -ffunction-sections -fdata-sections -fvisibility-inlines-hidden -fno-common" )
 
 file(GLOB_RECURSE UsePowerOperatorSources "../Transformations/UsePowerOperator/*.cpp")
 list(APPEND ClangModernizeSources ${UsePowerOperatorSources})
@@ -79,44 +79,106 @@ list(APPEND ClangModernizeSources ${UseFullyQualifiedTypesSources})
 file(GLOB_RECURSE QueryMangledNameSources "../Queries/QueryMangledName/*.cpp")
 list(APPEND ClangModernizeSources ${QueryMangledNameSources})
 
-add_clang_executable(clang-refactor
+#file(GLOB_RECURSE CoreSources "../Core/*.cpp")
+#list(APPEND ClangModernizeSources ${CoreSources})
+
+LINK_DIRECTORIES( /home/incubus/dev/llvm-clang-3.5-build/lib/ )
+
+add_executable(clang-refactor
   ${ClangModernizeSources}
   )
 
 
-add_dependencies(clang-refactor
-  clang-headers clang-apply-replacements
-)
+#add_dependencies(clang-refactor
+#  clang-headers clang-apply-replacements
+#)
+#    clangAST
+#    clangASTMatchers
+#    clangBasic
+#    clangFormat
+#    clangFrontend
+#    clangLex
+#    clangTooling
+#    refactorCore
+#    clangASTMatchers 
+#    clangFrontend 
+#    clangParse 
+#    LLVMMCParser 
+#    clangSerialization 
+#    clangSema 
+#    clangEdit 
+#    clangAnalysis 
+#    LLVMBitReader 
+#    LLVMCore 
+#    clangDriver 
+#    LLVMOption 
+#    clangRewrite 
+#    clangAST 
+#    clangLex 
+#    clangBasic 
+#    LLVMMC 
+#    LLVMSupport 
+#    rt  
+#    dl  
+#    tinfo  
+#    pthread  
+#    z 
+
 
 target_link_libraries(clang-refactor
-  clangAST
-  clangASTMatchers
-  clangBasic
-  clangFormat
-  clangFrontend
-  clangLex
-  clangTooling
-  refactorCore
+LLVMSupport
+clangAST
+clangASTMatchers
+clangBasic
+clangFormat
+clangFrontend
+clangLex
+clangTooling
+refactorCore
+clangTooling
+clangASTMatchers
+clangFrontend
+clangParse
+LLVMMCParser
+clangSerialization
+clangSema
+clangEdit
+clangAnalysis
+LLVMBitReader
+LLVMCore
+clangDriver
+LLVMOption
+clangRewrite
+clangAST
+clangLex
+clangBasic
+LLVMMC
+LLVMSupport
+rt
+dl
+tinfo
+pthread
+z
   )
 
-install(TARGETS clang-refactor
-  RUNTIME DESTINATION bin)
+#install(TARGETS clang-refactor
+#  RUNTIME DESTINATION bin)
 
-add_clang_library( refactorApp
-  ${ClangModernizeSources}
+#add_clang_library( refactorApp
+#  ${ClangModernizeSources}
+#
+#  LINK_LIBS
+#  clangAST
+#  clangASTMatchers
+#  clangBasic
+#  clangFrontend
+#  clangLex
+#  clangTooling
+#  refactorCore
+#)
 
-  LINK_LIBS
-  clangAST
-  clangASTMatchers
-  clangBasic
-  clangFrontend
-  clangLex
-  clangTooling
-  refactorCore
-)
-
-add_dependencies(refactorApp
-  clang-headers clang-apply-replacements
-)
+#add_dependencies(refactorApp
+#  clang-headers clang-apply-replacements
+#)
 
 

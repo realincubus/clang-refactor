@@ -24,6 +24,7 @@ using namespace llvm;
 using namespace llvm::sys;
 using namespace clang::tooling;
 
+
 bool ReplacementHandling::findClangApplyReplacements(const char *Argv0) {
   CARPath = FindProgramByName("clang-apply-replacements");
 
@@ -144,7 +145,7 @@ bool ReplacementHandling::generateReplacementsFileName(
   Error.clear();
   SmallString<128> Prefix = DestinationDir;
   path::append(Prefix, path::filename(MainSourceFile));
-  if (std::error_code EC =
+  if (auto EC =
           fs::createUniqueFile(Prefix + "_%%_%%_%%_%%_%%_%%.yaml", Result)) {
     const std::string &Msg = EC.message();
     Error.append(Msg.begin(), Msg.end());
