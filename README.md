@@ -15,23 +15,6 @@ I already wrote a plugin for vim
 
 ### Installation
 
-For building clang-refactor you need a stable llvm+clang+extra-tools build.
-[clang getting started](http://clang.llvm.org/get_started.html)
-
-In a stable llvm+clang+extra-tools build do
-```sh
-git clone https://github.com/realincubus/clang-refactor.git ${LLVM_ROOT}/tools/clang/tools/extra/clang-refactor
-``` 
-
-and add `add_subdirectory(clang-refactor)` to `${LLVM_ROOT}/tools/clang/tools/extra/CMakeLists.txt`
-this will add the refactor to the build chain.
-
-Now go to `${LLVM_BUILD_DIR}` and run make ( to speed it up `make -j ${number_of_threads}` )
-the executable will go to `${LLVM_BUILD_DIR}/bin`.
-
-I did not try, but running `sudo make install` should install this on your system.
-If you did not install, remember to put `${LLVM_BUILD_DIR}/bin` into your PATH.
-
 #### Using the systems installation of clang
 If a recent clang or llvm is installed one can now compile clang-refactor without the need to have a llvm+clang+extratools tree.
 Checkout the standalone branch of this repos and run cmake.
@@ -40,6 +23,20 @@ Tested on
   - Gentoo (clang 3.5.0)
   - Manjaro (clang 3.5.0) had to symlink libncurses to tinfo (ln -s /usr/lib/libncurses.so.5 /usr/lib/libtinfo.so)
 
+#### Using a custom llvm+clang+extratools build
+
+In a stable llvm+clang+extra-tools build do
+```sh
+git clone https://github.com/realincubus/clang-refactor.git ${LLVM_ROOT}/tools/clang/tools/extra/clang-refactor
+``` 
+and add `add_subdirectory(clang-refactor)` to `${LLVM_ROOT}/tools/clang/tools/extra/CMakeLists.txt`
+this will add the refactor to the build chain.
+
+Now go to `${LLVM_BUILD_DIR}` and run make ( to speed it up `make -j ${number_of_threads}` )
+the executable will go to `${LLVM_BUILD_DIR}/bin`.
+
+I did not try, but running `sudo make install` should install this on your system.
+If you did not install, remember to put `${LLVM_BUILD_DIR}/bin` into your PATH.
 
 ### Project Setup
 
