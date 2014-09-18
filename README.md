@@ -22,6 +22,14 @@ Checkout the standalone branch of this repos and run cmake.
 Tested on 
   - Gentoo (clang 3.5.0)
   - Manjaro (clang 3.5.0) had to symlink libncurses to tinfo (ln -s /usr/lib/libncurses.so.5 /usr/lib/libtinfo.so)
+  - LMDE (clang 3.5.0) 
+    - sice you can't get clang 3.5.0 from the standard sources. add :
+      - deb http://llvm.org/apt/unstable/ llvm-toolchain-3.5 main
+      - deb-src http://llvm.org/apt/unstable/ llvm-toolchain-3.5 main
+      - deb http://ftp.de.debian.org/debian testing main
+    - install clang3.5 and libclang-3.5-dev 
+    - set CPATH to /usr/lib/llvm-3.5/include 
+    - set LIBRAR_PATH to /usr/lib/llvm-3.5/lib/
 
 #### Using a custom llvm+clang+extratools build
 
