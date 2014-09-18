@@ -89,19 +89,6 @@ public:
 };
 #endif
 
-namespace {
-void ReplaceWith(Transform &Owner, SourceManager &SM,
-                        SourceLocation StartLoc, SourceLocation EndLoc, const clang::ASTContext& Context, std::string replacement ){ 
-    using namespace std;
-
-  CharSourceRange Range(SourceRange(StartLoc, EndLoc), true);
-
-  if ( isReplaceableRange( StartLoc, EndLoc, SM, Owner ) ){ 
-      Owner.addReplacementForCurrentTU( tooling::Replacement(SM, Range, replacement ));
-  }
-}
-}
-
 UseRAIIFixer::UseRAIIFixer(unsigned &AcceptedChanges,
                            Transform &Owner)
     : AcceptedChanges(AcceptedChanges), Owner(Owner) {
@@ -113,73 +100,40 @@ void UseRAIIFixer::run(const ast_matchers::MatchFinder::MatchResult &Result) {
   ASTContext& context = *Result.Context;
   SourceManager& SM = context.getSourceManager();
 
+  llvm::errs() << "starting actions\n";
 #if 1
-  const auto* node = Result.Nodes.getNodeAs<CompoundStmt>(MatcherUseRAIIID);
+  const auto* node = Result.Nodes.getNodeAs<Stmt>("stmt");
   if ( node ) {
       if ( !Owner.isInRange( node, SM ) ) return;
-      // TODO filter declares that are not in this compound statement
-      const auto* decl_ref = Result.Nodes.getNodeAs<DeclRefExpr>(MatcherDeclRef);
 
-      cout << "searching binary operator " << endl;
-      // TODO determin stmts position inside the compound stmt 
-      const auto* binary_operator = Result.Nodes.getNodeAs<BinaryOperator>(MatcherBinOp);
-      if ( !binary_operator ) return;
+      return;
 
-      cout << getString( binary_operator, SM ) << endl;
-      decltype(node->body_begin()) position = node->body_end();
-      for( auto it = node->body_begin(), end = node->body_end(); it != end ; it++ ){
-	  if ( (*it) == binary_operator ) {
-	      position = it;
-	      break;
-	  }
-      }
-      if ( position == node->body_end() ) {
-	return;
-      }
-      cout << "found binary operator in the compound statment " << endl;
-      
-      // this does not work if it is the first statement in the compound statement
-      if ( position == node->body_begin() ) {
-	  cout << "is at the begining" << endl;	  
-	  cout << getString( binary_operator, SM ) << endl;
-	  return;
-      }
-      auto second_last = position;
-      second_last--;
+      const auto* binary_operator = Result.Nodes.getNodeAs<BinaryOperator>("binary_operator");
+      const auto* var_decl = Result.Nodes.getNodeAs<VarDecl>("decl");
 
-      auto declStmt = dyn_cast_or_null<DeclStmt>(*second_last);
+      assert( binary_operator && var_decl && "could not fetch" ) ;
 
-      if ( !(declStmt) || !declStmt->isSingleDecl() ){
-	  return;
-      }
-      cout << "second last statement is a single declaration statement " << endl;
+      llvm::errs() << "fetch rhs\n";
       auto rhs = binary_operator->getRHS();
       if ( !rhs ) return;
-      auto single_decl = declStmt->getSingleDecl();
-      if ( !single_decl ) return;
-      auto val_dec = dyn_cast_or_null<ValueDecl>(single_decl);
-      if ( !val_dec ) return;
-
-      auto var_dec = dyn_cast_or_null<VarDecl>(val_dec);
-      if ( !var_dec ) return;
-      if ( var_dec->isStaticLocal() ) return;
-
-      if ( val_dec != decl_ref->getDecl() ) return;
 
       // add the initializer to the declare
       {
-	  SourceLocation StartLoc = single_decl->getLocStart();
-	  SourceLocation EndLoc = single_decl->getLocEnd();
-	  string replacement = getString( single_decl, SM ) + string(" = ") + getString( rhs, SM );
-	  ReplaceWith( Owner, SM, StartLoc, EndLoc, context, replacement );
+	  llvm::errs() << "add init\n";
+	  SourceLocation StartLoc = var_decl->getLocStart();
+	  SourceLocation EndLoc = var_decl->getLocEnd();
+	  string replacement = getString( var_decl, SM ) + string(" = ") + getString( rhs, SM );
+	  ReplaceWithString( Owner, SM, StartLoc, EndLoc, context, replacement );
       }
       // remove the assign statement
       {
+	  llvm::errs() << "remove assign statement\n";
 	  SourceLocation StartLoc = binary_operator->getLocStart();
 	  SourceLocation EndLoc = binary_operator->getLocEnd();
-	  ReplaceWith( Owner, SM, StartLoc, EndLoc, context, "" );
+	  ReplaceWithString( Owner, SM, StartLoc, EndLoc, context, "" );
       }
   }
+  llvm::errs() << "done\n";
 #endif
 
 }

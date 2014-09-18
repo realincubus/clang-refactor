@@ -15,42 +15,35 @@
 
 #include "UseRAIIMatchers.h"
 #include "clang/AST/ASTContext.h"
+#include "Core/MatcherUtils.hpp"
 
 using namespace clang::ast_matchers;
 using namespace clang;
 
-const char *MatcherUseRAIIID = "matcherUseRAIIID";
-const char *MatcherDeclRef = "matcherDeclRef";
-const char *MatcherBinOp = "matcherBinOp";
-
 
 StatementMatcher makeUseRAIIMatcher(){
-#if 0
-    return binaryOperator(
+    return stmt(
+	    binaryOperator(
+		hasOperatorName("="),
 		hasLHS(
-		    declRefExpr()
+		    declRefExpr(
+			to(
+			    varDecl().bind("refs_decl")
+			)
 		    )
-	    ).bind(MatcherUseRAIIID);
-#endif
-#if 1
-    return compoundStmt(
-	    forEach(
-	    //hasDescendant(
-		binaryOperator(
-		    hasOperatorName("="),
-		    hasLHS(
-			declRefExpr(
-			    
-			).bind(MatcherDeclRef)
-		    ),
-		    hasRHS(
-			anything()
+		)
+	    ).bind("binary_operator"),
+	    predecessorStmt(
+		declStmt(
+		    hasSingleDecl(
+			varDecl(
+			    equalsBoundNode("refs_decl"),
+			    hasLocalStorage()
+			).bind("decl")
 		    )
-		).bind(MatcherBinOp)
+		).bind("decl_stmt")
 	    )
-	    
-    ).bind(MatcherUseRAIIID);
-#endif
+    ).bind("stmt");
 }
 
 

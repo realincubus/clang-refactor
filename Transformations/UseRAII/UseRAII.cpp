@@ -45,7 +45,7 @@ int UseRAIITransform::apply(const CompilationDatabase &Database,
   }
 
   setAcceptedChanges(AcceptedChanges);
-
+  llvm::errs() << "done everything\n";
   return 0;
 }
 
