@@ -82,7 +82,9 @@ list(APPEND ClangModernizeSources ${QueryMangledNameSources})
 #file(GLOB_RECURSE CoreSources "../Core/*.cpp")
 #list(APPEND ClangModernizeSources ${CoreSources})
 
-LINK_DIRECTORIES( /home/incubus/dev/llvm-clang-3.5-build/lib/ )
+# if you use a non standard directory for your libraries you have to add it
+# here
+#LINK_DIRECTORIES( /home/incubus/dev/llvm-clang-3.5-build/lib/ )
 
 add_executable(clang-refactor
   ${ClangModernizeSources}
