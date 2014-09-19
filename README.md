@@ -16,12 +16,13 @@ I already wrote a plugin for vim
 ### Installation
 
 #### Using the systems installation of clang
-If a recent clang or llvm is installed one can now compile clang-refactor without the need to have a llvm+clang+extratools tree.
+If a recent clang or llvm is installed one can now compile clang-refactor without the need to have a llvm+clang+clang-tools-extra tree.
 Checkout the standalone branch of this repos and run cmake.
 
 Tested on 
-  - Gentoo (clang 3.5.0)
-  - Manjaro (clang 3.5.0) had to symlink libncurses to tinfo (ln -s /usr/lib/libncurses.so.5 /usr/lib/libtinfo.so)
+  - Gentoo (clang 3.5.0 and 3.6.0)
+  - Manjaro (clang 3.5.0) 
+    - had to symlink libncurses to tinfo (ln -s /usr/lib/libncurses.so.5 /usr/lib/libtinfo.so)
   - LMDE (clang 3.5.0) 
     - sice you can't get clang 3.5.0 from the standard sources. add :
       - deb http://llvm.org/apt/unstable/ llvm-toolchain-3.5 main
@@ -31,7 +32,7 @@ Tested on
     - set CPATH to /usr/lib/llvm-3.5/include 
     - set LIBRAR_PATH to /usr/lib/llvm-3.5/lib/
 
-#### Using a custom llvm+clang+extratools build
+#### Using a custom llvm+clang+clang-tools-extra build
 
 In a stable llvm+clang+extra-tools build do
 ```sh
