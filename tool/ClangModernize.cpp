@@ -272,8 +272,8 @@ std::unique_ptr<CompilationDatabase>
 autoDetectCompilations(std::string &ErrorMessage) {
   // Auto-detect a compilation database from BuildPath.
   if (BuildPath.getNumOccurrences() > 0)
-    return CompilationDatabase::autoDetectFromDirectory(BuildPath,
-                                                        ErrorMessage);
+    return std::unique_ptr<CompilationDatabase>(CompilationDatabase::autoDetectFromDirectory(BuildPath,
+                                                        ErrorMessage));
   // Try to auto-detect a compilation database from the first source.
   if (!SourcePaths.empty()) {
     if ( auto Compilations = 
@@ -288,7 +288,7 @@ autoDetectCompilations(std::string &ErrorMessage) {
       // Ignore a detected compilation database that doesn't contain source0
       // since it is probably an unrelated compilation database.
       if (!Commands.empty())
-        return Compilations;
+        return std::unique_ptr<CompilationDatabase>(std::move(Compilations));
     }
     // Reset ErrorMessage since a fix compilation database will be created if
     // it fails to detect one from source.
@@ -296,7 +296,7 @@ autoDetectCompilations(std::string &ErrorMessage) {
     // If no compilation database can be detected from source then we create a
     // fixed compilation database with c++11 support.
     std::string CommandLine[] = { "-std=c++11" };
-    return std::make_unique<FixedCompilationDatabase>(".", CommandLine);
+    return llvm::make_unique<FixedCompilationDatabase>(".", CommandLine);
   }
 
   ErrorMessage = "Could not determine sources to transform";
