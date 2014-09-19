@@ -18,6 +18,7 @@
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Lex/HeaderSearch.h"
 #include "clang/Lex/Preprocessor.h"
+#include "clang/Basic/Version.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/StringSwitch.h"
 #include <stack>
@@ -114,8 +115,13 @@ private:
     // The #ifndef should be the next thing after the preamble. We aren't
     // checking for equality because it can also be part of the preamble if the
     // preamble is the whole file.
+#if CLANG_VERSION_MINOR >= 6
+    unsigned Preamble =
+        Lexer::ComputePreamble(SM.getBuffer(Guard.FID)->getBuffer(), LangOpts).first;
+#else
     unsigned Preamble =
         Lexer::ComputePreamble(SM.getBuffer(Guard.FID), LangOpts).first;
+#endif
     unsigned IfndefOffset = SM.getFileOffset(Guard.IfndefLoc);
     if (IfndefOffset > (Preamble + 1))
       return;

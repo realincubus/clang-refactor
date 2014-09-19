@@ -45,11 +45,17 @@ public:
 
 private:
   class FactoryAdaptor : public ASTFrontendAction {
+  private:
+    MatchFinder &Finder;
+    Transform &Owner;
   public:
     FactoryAdaptor(MatchFinder &Finder, Transform &Owner)
         : Finder(Finder), Owner(Owner) {}
 
-    ASTConsumer *CreateASTConsumer(CompilerInstance &, StringRef) {
+    template<typename S>
+    using result = typename std::result_of<S>::type;
+
+    auto CreateASTConsumer(CompilerInstance &CI, StringRef sr) -> decltype(Finder.newASTConsumer()) {
       return Finder.newASTConsumer();
     }
 
@@ -66,9 +72,6 @@ private:
       return ASTFrontendAction::EndSourceFileAction();
     }
 
-  private:
-    MatchFinder &Finder;
-    Transform &Owner;
   };
 
   MatchFinder &Finder;

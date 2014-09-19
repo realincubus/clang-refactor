@@ -268,15 +268,16 @@ static CompilerVersions handleSupportedCompilers(const char *ProgName,
   return RequiredVersions;
 }
 
-CompilationDatabase *autoDetectCompilations(std::string &ErrorMessage) {
+std::unique_ptr<CompilationDatabase> 
+autoDetectCompilations(std::string &ErrorMessage) {
   // Auto-detect a compilation database from BuildPath.
   if (BuildPath.getNumOccurrences() > 0)
     return CompilationDatabase::autoDetectFromDirectory(BuildPath,
                                                         ErrorMessage);
   // Try to auto-detect a compilation database from the first source.
   if (!SourcePaths.empty()) {
-    if (CompilationDatabase *Compilations =
-            CompilationDatabase::autoDetectFromSource(SourcePaths[0],
+    if ( auto Compilations = 
+    		CompilationDatabase::autoDetectFromSource(SourcePaths[0],
                                                       ErrorMessage)) {
       // FIXME: just pass SourcePaths[0] once getCompileCommands supports
       // non-absolute paths.
@@ -295,7 +296,7 @@ CompilationDatabase *autoDetectCompilations(std::string &ErrorMessage) {
     // If no compilation database can be detected from source then we create a
     // fixed compilation database with c++11 support.
     std::string CommandLine[] = { "-std=c++11" };
-    return new FixedCompilationDatabase(".", CommandLine);
+    return std::make_unique<FixedCompilationDatabase>(".", CommandLine);
   }
 
   ErrorMessage = "Could not determine sources to transform";
@@ -354,7 +355,7 @@ int main(int argc, const char **argv) {
 
   if (!Compilations) {
     std::string ErrorMessage;
-    Compilations.reset(autoDetectCompilations(ErrorMessage));
+    Compilations = autoDetectCompilations(ErrorMessage);
     if (!Compilations) {
       llvm::errs() << llvm::sys::path::filename(argv[0]) << ": " << ErrorMessage
                    << "\n";

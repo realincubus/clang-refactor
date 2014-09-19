@@ -5,7 +5,7 @@ set (ClangModernizeSources
   )
 
 # FIXME: Lib-ify the transforms to simplify the build rules.
-SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Og -DCLANG_ENABLE_ARCMT -DCLANG_ENABLE_OBJC_REWRITER -DCLANG_ENABLE_STATIC_ANALYZER -DGTEST_HAS_RTTI=0 -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -fno-rtti -fPIC -ffunction-sections -fdata-sections -fvisibility-inlines-hidden -fno-common" )
+SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -Og -DCLANG_ENABLE_ARCMT -DCLANG_ENABLE_OBJC_REWRITER -DCLANG_ENABLE_STATIC_ANALYZER -DGTEST_HAS_RTTI=0 -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -fno-rtti -fPIC -ffunction-sections -fdata-sections -fvisibility-inlines-hidden -fno-common" )
 
 file(GLOB_RECURSE UsePowerOperatorSources "../Transformations/UsePowerOperator/*.cpp")
 list(APPEND ClangModernizeSources ${UsePowerOperatorSources})
